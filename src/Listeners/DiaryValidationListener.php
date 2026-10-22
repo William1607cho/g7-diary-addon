@@ -37,11 +37,25 @@ class DiaryValidationListener implements HookListenerInterface
     public function __construct(private readonly DiaryBoards $boards) {}
 
     /**
+     * sirsoft-board fires different rule filters per path: the user post API
+     * (`Http/Requests/User/*PostRequest`) uses `user_post.*`, the admin post API
+     * (`Http/Requests/*PostRequest`) uses `post.*`. Both are subscribed.
+     *
      * @return array<string, array<string, mixed>>
      */
     public static function getSubscribedHooks(): array
     {
         return [
+            'sirsoft-board.user_post.store_validation_rules' => [
+                'method' => 'storeRules',
+                'type' => 'filter',
+                'priority' => 20,
+            ],
+            'sirsoft-board.user_post.update_validation_rules' => [
+                'method' => 'updateRules',
+                'type' => 'filter',
+                'priority' => 20,
+            ],
             'sirsoft-board.post.store_validation_rules' => [
                 'method' => 'storeRules',
                 'type' => 'filter',
