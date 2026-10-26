@@ -40,7 +40,6 @@
   "prev_page": "이전 쪽",
   "next_page": "다음 쪽",
   "memories_title": "다시 꺼내 본 일기",
-  "memories_hint": "오늘({{date}}) 기준으로 N년 전 오늘 → 지난해들의 같은 달 → 랜덤 순서로 골랐습니다.",
   "memories_reroll": "다시 뽑기",
   "close": "닫기"
 }

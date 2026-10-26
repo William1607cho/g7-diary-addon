@@ -239,7 +239,7 @@ button.g7da-pcell { position: relative; aspect-ratio: 1 / 1; min-width: 0; paddi
 .g7da-card-link:focus-visible, .g7da-mem-pop:focus, .g7da-mem-link:focus-visible { outline: none; }
 .g7da-mem-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
 .g7da-mem-title { font-size: 1.25rem; font-weight: 700; }
-.g7da-mem-hint, .g7da-mem-date { margin-top: .25rem; font-size: .8125rem; color: var(--g7da-muted); }
+.g7da-mem-date { margin-top: .25rem; font-size: .8125rem; color: var(--g7da-muted); }
 .g7da-mem-loading { padding: 3rem 1rem; text-align: center; color: var(--g7da-muted); }
 .g7da-mem-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
 .g7da-mem-card { position: relative; display: flex; flex-direction: column; gap: .375rem; min-width: 0; min-height: 13rem; padding: .75rem; overflow: hidden; border: 1px solid var(--g7da-line); border-radius: .75rem; background: var(--g7da-card); }

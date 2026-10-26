@@ -5,8 +5,9 @@ namespace Plugins\G7\Diary\Addon\Support;
 /**
  * Picks posts for "지난 오늘" (pure, for unit tests).
  *
- * Order: ① this day in past years (same month and day, earlier years) → ② the same month
- * in past years → ③ any other post at random. Each step is shuffled; excluded ids are
+ * Order: ① this day in past years (same month and day, earlier years; nearest year first —
+ * D97) → ② the same month in past years → ③ any other post at random. Steps ② and ③ (and
+ * posts of the same year in ①) are shuffled; excluded ids are
  * skipped. Only posts the viewer may open are passed in (live, not blinded — D6).
  * 29 February: on 28 February of a common year, 29 February of past years counts as
  * "this day" too; on 29 February only past 29 Februaries do (D82).
@@ -37,7 +38,12 @@ final class MemoryPicker
 
         $out = [];
         foreach ($tiers as $reason => $list) {
-            foreach ($shuffle($list) as $c) {
+            $list = $shuffle($list);
+            if ($reason === self::YEARS_AGO) {
+                // D97: this day in past years, nearest year first ("1년 전 오늘" leads); same year stays shuffled (stable sort).
+                usort($list, static fn (array $a, array $b): int => strcmp(substr($b['date'], 0, 4), substr($a['date'], 0, 4)));
+            }
+            foreach ($list as $c) {
                 if (count($out) >= $count) {
                     return $out;
                 }

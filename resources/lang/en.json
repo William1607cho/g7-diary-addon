@@ -40,7 +40,6 @@
   "prev_page": "Previous",
   "next_page": "Next",
   "memories_title": "From your diary",
-  "memories_hint": "Picked for today ({{date}}): this day in past years, then the same month, then at random.",
   "memories_reroll": "Pick again",
   "close": "Close"
 }

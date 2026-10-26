@@ -85,8 +85,11 @@ class Bundle3Test extends TestCase
         ];
         $p = MemoryPicker::pick($c, '2026-10-26', [], 3, $this->keepOrder());
 
-        $this->assertSame([3, 4, 2], array_column($p, 'id'));
-        $this->assertSame(['2년 전 오늘', '1년 전 오늘', '지난해 10월'], array_column($p, 'label'));
+        // "1년 전 오늘" leads even when the shuffle puts the older year first (D97).
+        $this->assertSame([4, 3, 2], array_column($p, 'id'));
+        $this->assertSame(['1년 전 오늘', '2년 전 오늘', '지난해 10월'], array_column($p, 'label'));
+        $reversed = MemoryPicker::pick($c, '2026-10-26', [], 2, static fn (array $l): array => array_reverse($l));
+        $this->assertSame([4, 3], array_column($reversed, 'id'));
         $this->assertSame([1, 5], array_column(MemoryPicker::pick($c, '2026-10-26', [3, 4, 2], 3, $this->keepOrder()), 'id'));
         $this->assertSame('랜덤', MemoryPicker::pick($c, '2026-10-26', [3, 4, 2], 1, $this->keepOrder())[0]['label']);
         $this->assertSame([], MemoryPicker::pick($c, '2026-10-26', [1, 2, 3, 4, 5], 3, $this->keepOrder()));

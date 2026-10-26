@@ -1,5 +1,5 @@
 {
-  "comment": "지난 오늘 popup (wide screens): dimmed backdrop (click closes), centred dialog about 820px wide — title, one-line hint, close button; three cards (reason badge, category emoji, title, date with weekday, 3-line preview with fade, first photo on top); 'pick again' excludes the posts shown now. Missing places get the settings message card. Esc, focus kept inside and focus back to the icon are done by the plugin script.",
+  "comment": "지난 오늘 popup (wide screens): dimmed backdrop (click closes), centred dialog about 820px wide — title and close button only (the picking order is explained on the admin screen, D97); three cards (reason badge, category emoji, title, date with weekday, 3-line preview with fade, first photo on top); 'pick again' excludes the posts shown now. Missing places get the settings message card. Esc, focus kept inside and focus back to the icon are done by the plugin script.",
   "type": "basic",
   "name": "Div",
   "if": "{{_local.g7daMemOpen}}",
@@ -23,14 +23,7 @@
           "name": "Div",
           "props": { "className": "g7da-mem-head" },
           "children": [
-            {
-              "type": "basic",
-              "name": "Div",
-              "children": [
-                { "type": "basic", "name": "H2", "props": { "id": "g7da-mem-title", "className": "g7da-mem-title" }, "text": "$t:g7-diary-addon.memories_title" },
-                { "type": "basic", "name": "P", "props": { "className": "g7da-mem-hint" }, "text": "$t:g7-diary-addon.memories_hint|date={{_local.g7daMem?.today_label ?? ''}}" }
-              ]
-            },
+            { "type": "basic", "name": "H2", "props": { "id": "g7da-mem-title", "className": "g7da-mem-title" }, "text": "$t:g7-diary-addon.memories_title" },
             {
               "type": "basic",
               "name": "Button",
