@@ -30,21 +30,31 @@ class PhotoStripTest extends TestCase
         $this->assertSame([0, 0], array_column($two, 'more_narrow'));
     }
 
-    public function test_four_photos_cover_only_on_narrow_screens(): void
+    public function test_three_photos_cover_only_on_narrow_screens(): void
     {
-        $cells = PhotoStrip::cells(array_slice(self::H, 0, 4));
+        // D74: wide shows up to 3, narrow up to 2.
+        $cells = PhotoStrip::cells(array_slice(self::H, 0, 3));
 
-        $this->assertSame([0, 0, 0, 0], array_column($cells, 'more_wide'));
-        $this->assertSame([0, 0, 1, 0], array_column($cells, 'more_narrow')); // narrow shows 3 → +1 on cell 3
+        $this->assertCount(3, $cells);
+        $this->assertSame([0, 0, 0], array_column($cells, 'more_wide'));
+        $this->assertSame([0, 1, 0], array_column($cells, 'more_narrow')); // narrow shows 2 → +1 on cell 2
     }
 
-    public function test_five_photos_cover_cell_four_wide_and_cell_three_narrow(): void
+    public function test_five_photos_cover_cell_three_wide_and_cell_two_narrow(): void
     {
         $cells = PhotoStrip::cells(array_slice(self::H, 0, 5));
 
-        $this->assertCount(4, $cells);
-        $this->assertSame([0, 0, 0, 1], array_column($cells, 'more_wide'));
-        $this->assertSame([0, 0, 2, 0], array_column($cells, 'more_narrow'));
+        $this->assertCount(3, $cells);
+        $this->assertSame([0, 0, 2], array_column($cells, 'more_wide'));   // 5 − 3
+        $this->assertSame([0, 3, 0], array_column($cells, 'more_narrow')); // 5 − 2
+    }
+
+    public function test_four_photos(): void
+    {
+        $cells = PhotoStrip::cells(array_slice(self::H, 0, 4));
+
+        $this->assertSame([0, 0, 1], array_column($cells, 'more_wide'));
+        $this->assertSame([0, 2, 0], array_column($cells, 'more_narrow'));
     }
 
     public function test_body_order_and_variant_mapping(): void
@@ -53,7 +63,9 @@ class PhotoStripTest extends TestCase
         $cells = PhotoStrip::cells(['aaaaaaaaaaa3', 'aaaaaaaaaaa2', 'aaaaaaaaaaa1'], $small);
 
         $this->assertSame(['/api/plugins/sirsoft-ckeditor5/images/aaaaaaaaaaa3', '/v/2-240.webp', '/api/plugins/sirsoft-ckeditor5/images/aaaaaaaaaaa1'], array_column($cells, 'src'));
-        $this->assertSame(4, count(PhotoStrip::urls(self::H)));
+        $this->assertSame(3, count(PhotoStrip::urls(self::H)));
+        $this->assertSame(3, PhotoStrip::CELLS_WIDE);
+        $this->assertSame(2, PhotoStrip::CELLS_NARROW);
     }
 
     public function test_new_install_seed_names_category_three_anger_diary(): void

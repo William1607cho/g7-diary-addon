@@ -69,7 +69,7 @@ button.g7da-card-link { display: flex; align-items: center; justify-content: fle
 .g7da-comments { display: inline-flex; align-items: center; gap: .25rem; }
 
 /* body block = preview (about 6 lines) + photo row; one fade at its bottom only when there is more to see (D72):
-   text cut (server is-more-text / measured g7da-overflow) or a +N on the photo row (wide: >4, narrow: >3) */
+   text cut (server is-more-text / measured g7da-overflow) or a +N on the photo row (wide: >3, narrow: >2 — D74) */
 .g7da-body { position: relative; }
 .g7da-body::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; display: none; height: 2.5rem; background: linear-gradient(to bottom, transparent, var(--g7da-card)); pointer-events: none; }
 .g7da-body.is-more-text::after, .g7da-body.is-more-wide::after, .g7da-body.g7da-overflow::after { display: block; }
@@ -84,8 +84,8 @@ button.g7da-card-link { display: flex; align-items: center; justify-content: fle
 .dark .g7da-preview-body a { color: #93c5fd; }
 .g7da-preview-body pre, .g7da-preview-body code { font-size: .8125rem; white-space: pre-wrap; }
 
-/* photo row (D64): square thumbnails, 4 cells wide / 3 narrow, '+N' cover on the last shown cell */
-.g7da-photos { display: grid; grid-template-columns: repeat(4, minmax(0, 7.5rem)); gap: .375rem; margin-top: .625rem; pointer-events: none; }
+/* photo row (D64 / D74): square thumbnails, 3 cells wide / 2 narrow, '+N' cover on the last shown cell; cell size unchanged (7.5rem wide) */
+.g7da-photos { display: grid; grid-template-columns: repeat(3, minmax(0, 7.5rem)); gap: .375rem; margin-top: .625rem; pointer-events: none; }
 .g7da-ph { position: relative; aspect-ratio: 1 / 1; overflow: hidden; border-radius: .5rem; background: #f3f4f6; }
 .dark .g7da-ph { background: #374151; }
 .g7da-ph img { display: block; width: 100%; height: 100%; object-fit: cover; }
@@ -177,9 +177,9 @@ button.g7da-card-link { display: flex; align-items: center; justify-content: fle
   .g7da-cat, .g7da-weather { font-size: 1rem; }
   .g7da-flags { order: 4; }
   .g7da-title-wrap { order: 5; flex-basis: 100%; font-size: 1.21875rem; line-height: 1.75rem; }
-  /* photo row: 3 cells, the 4th hidden; the cover moves to cell 3 */
+  /* photo row: 2 cells (the 3rd hidden) on the same 1/3-width grid, so the cell size stays as before (D74); the cover moves to cell 2 */
   .g7da-photos { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .g7da-ph:nth-child(n+4) { display: none; }
+  .g7da-ph:nth-child(n+3) { display: none; }
   .g7da-ph-more--wide { display: none; }
   .g7da-ph-more--narrow { display: flex; }
   .g7da-body.is-more-wide::after { display: none; }

@@ -1,5 +1,5 @@
 {
-  "comment": "Photo row (D64): editor images of the body, in body order, square thumbnails (240 variant, else original). Up to 4 cells on wide screens, 3 on narrow (CSS); the last shown cell gets a '+N' cover when there are more. Not drawn without photos; locked secret posts and blinded posts carry none (server). Clicks pass through to the card link.",
+  "comment": "Photo row (D64 / D74): editor images of the body, in body order, square thumbnails (240 variant, else original). Up to 3 cells on wide screens, 2 on narrow (CSS); the last shown cell gets a '+N' cover when there are more. Not drawn without photos; locked secret posts and blinded posts carry none (server). Clicks pass through to the card link.",
   "type": "basic",
   "name": "Div",
   "if": "{{(post?.diary_photos ?? []).length > 0}}",

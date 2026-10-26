@@ -62,12 +62,12 @@
       ]
     },
     {
-      "comment": "Body block = text preview + photo row (D72). One fade at its bottom, only when there is more to see: the text was cut (is-more-text, or measured overflow), or the photo row has a +N (wide: more than 4 photos, narrow: more than 3 — CSS picks the class for the screen).",
+      "comment": "Body block = text preview + photo row (D72). One fade at its bottom, only when there is more to see: the text was cut (is-more-text, or measured overflow), or the photo row has a +N (wide: more than 3 photos, narrow: more than 2 — D74; CSS picks the class for the screen).",
       "type": "basic",
       "name": "Div",
       "if": "{{post?.diary_preview_html || (post?.diary_photos ?? []).length > 0}}",
       "props": {
-        "className": "{{'g7da-body' + (post?.diary_preview_clipped ? ' is-more-text' : '') + ((post?.diary_photo_count ?? 0) > 4 ? ' is-more-wide' : '') + ((post?.diary_photo_count ?? 0) > 3 ? ' is-more-narrow' : '')}}"
+        "className": "{{'g7da-body' + (post?.diary_preview_clipped ? ' is-more-text' : '') + ((post?.diary_photo_count ?? 0) > 3 ? ' is-more-wide' : '') + ((post?.diary_photo_count ?? 0) > 2 ? ' is-more-narrow' : '')}}"
       },
       "children": [
         {

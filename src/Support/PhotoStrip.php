@@ -3,17 +3,17 @@
 namespace Plugins\G7\Diary\Addon\Support;
 
 /**
- * The square thumbnail row under a list card (pure, for unit tests). D64.
+ * The square thumbnail row under a list card (pure, for unit tests). D64 / D74.
  *
- * At most 4 cells (wide screens); narrow screens show the first 3 (CSS). The last shown cell
+ * At most 3 cells (wide screens); narrow screens show the first 2 (CSS). The last shown cell
  * carries a "+N" cover when there are more photos: N = photos not shown at all —
- * wide: count − 4 on cell 4, narrow: count − 3 on cell 3.
+ * wide: count − 3 on cell 3, narrow: count − 2 on cell 2.
  */
 final class PhotoStrip
 {
-    public const CELLS_WIDE = 4;
+    public const CELLS_WIDE = 3;
 
-    public const CELLS_NARROW = 3;
+    public const CELLS_NARROW = 2;
 
     /** Editor image address of a hash (the same address the body uses). */
     public const EDITOR_URL = '/api/plugins/sirsoft-ckeditor5/images/';
@@ -40,7 +40,7 @@ final class PhotoStrip
     }
 
     /**
-     * Addresses of the cells that may go to the variant contract (first 4).
+     * Addresses of the cells that may go to the variant contract (first CELLS_WIDE).
      *
      * @param  array<int, string>  $hashes
      * @return array<int, string>
