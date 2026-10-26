@@ -1,0 +1,85 @@
+{
+  "comment": "Bundle 3 icons: calendar, photos, 지난 오늘 (wide: popup; narrow: one post at once — plugin script). The wrapper takes no box (display: contents). Photos carries the list's category filter (diary_category). 지난 오늘 has no Font Awesome glyph in the template subset, so it is an inline SVG mask in the plugin CSS (g7da-ico-rewind).",
+  "type": "basic",
+  "name": "Span",
+  "props": { "className": "g7da-icons-sub" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Button",
+      "props": {
+        "type": "button",
+        "className": "{{'g7da-icon-btn' + (_local.g7daScreen === 'calendar' ? ' is-on' : '')}}",
+        "aria-label": "$t:g7-diary-addon.calendar",
+        "aria-current": "{{_local.g7daScreen === 'calendar' ? 'page' : 'false'}}",
+        "data-g7da-tip": "$t:g7-diary-addon.calendar",
+        "data-testid": "g7da-nav-calendar"
+      },
+      "actions": [
+        { "type": "click", "handler": "navigate", "params": { "path": "/diary/{{route.slug}}/calendar" } }
+      ],
+      "children": [
+        { "type": "basic", "name": "Icon", "props": { "name": "calendar-days", "aria-hidden": "true" } }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Button",
+      "props": {
+        "type": "button",
+        "className": "{{'g7da-icon-btn' + (_local.g7daScreen === 'photos' ? ' is-on' : '')}}",
+        "aria-label": "$t:g7-diary-addon.photos",
+        "aria-current": "{{_local.g7daScreen === 'photos' ? 'page' : 'false'}}",
+        "data-g7da-tip": "$t:g7-diary-addon.photos",
+        "data-testid": "g7da-nav-photos"
+      },
+      "actions": [
+        { "type": "click", "handler": "navigate", "params": { "path": "/diary/{{route.slug}}/photos", "query": { "diary_category": "{{query.diary_category ?? ''}}" } } }
+      ],
+      "children": [
+        { "type": "basic", "name": "Icon", "props": { "name": "images", "aria-hidden": "true" } }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Button",
+      "props": {
+        "type": "button",
+        "className": "g7da-icon-btn g7da-mem-wide",
+        "aria-label": "$t:g7-diary-addon.memories",
+        "aria-haspopup": "dialog",
+        "data-g7da-tip": "$t:g7-diary-addon.memories",
+        "data-g7da-mem-open": "1",
+        "data-testid": "g7da-nav-memories"
+      },
+      "actions": [
+        {
+          "type": "click",
+          "handler": "sequence",
+          "actions": [
+            { "handler": "setState", "params": { "target": "local", "g7daMemOpen": true, "g7daMem": null } },
+            { "g7da_include": "common/memories-fetch" }
+          ]
+        }
+      ],
+      "children": [
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-ico-rewind", "aria-hidden": "true" } }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Button",
+      "props": {
+        "type": "button",
+        "className": "g7da-icon-btn g7da-mem-narrow",
+        "aria-label": "$t:g7-diary-addon.memories",
+        "data-g7da-tip": "$t:g7-diary-addon.memories",
+        "data-g7da-memory-go": "{{route.slug}}",
+        "data-testid": "g7da-nav-memories-go"
+      },
+      "children": [
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-ico-rewind", "aria-hidden": "true" } }
+      ]
+    }
+  ]
+}

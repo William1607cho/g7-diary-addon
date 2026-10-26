@@ -1,0 +1,15 @@
+{
+  "comment": "Weekday head row of the month calendars (Sunday red, Saturday blue — CSS).",
+  "type": "basic",
+  "name": "Div",
+  "props": { "className": "g7da-dow", "aria-hidden": "true" },
+  "children": [
+    { "type": "basic", "name": "Span", "props": { "className": "is-sun" }, "text": "일" },
+    { "type": "basic", "name": "Span", "text": "월" },
+    { "type": "basic", "name": "Span", "text": "화" },
+    { "type": "basic", "name": "Span", "text": "수" },
+    { "type": "basic", "name": "Span", "text": "목" },
+    { "type": "basic", "name": "Span", "text": "금" },
+    { "type": "basic", "name": "Span", "props": { "className": "is-sat" }, "text": "토" }
+  ]
+}

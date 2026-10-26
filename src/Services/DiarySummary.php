@@ -3,6 +3,7 @@
 namespace Plugins\G7\Diary\Addon\Services;
 
 use Illuminate\Http\Request;
+use Plugins\G7\Diary\Addon\Support\BoardAbilities;
 use Plugins\G7\Diary\Addon\Support\CategoryCounts;
 use Plugins\G7\Diary\Addon\Support\DiaryCatalog;
 use Plugins\G7\Diary\Addon\Support\SecretVisibility;
@@ -21,10 +22,11 @@ class DiarySummary
         private readonly DiaryPostReader $reader,
         private readonly DiaryCatalog $catalog,
         private readonly SecretVisibility $visibility,
+        private readonly BoardAbilities $abilities,
     ) {}
 
     /**
-     * @return array{streak: array{current: int, longest: int, days: int}, total: int, today: string, categories: array<int, array<string, mixed>>}
+     * @return array{board: array{slug: string, name: string, can_write: bool}, streak: array{current: int, longest: int, days: int}, total: int, today: string, categories: array<int, array<string, mixed>>}
      */
     public function forBoard(object $board, Request $request): array
     {
@@ -43,6 +45,11 @@ class DiarySummary
         $today = SiteClock::today();
 
         return [
+            'board' => [
+                'slug' => (string) $board->slug,
+                'name' => BoardAbilities::name($board->name ?? null, app()->getLocale()),
+                'can_write' => $this->abilities->canWrite((string) $board->slug),
+            ],
             'streak' => Streak::compute($dates, $today),
             'total' => count($rows),
             'today' => $today,

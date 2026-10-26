@@ -14,16 +14,16 @@
       "name": "Button",
       "props": {
         "type": "button",
-        "className": "{{'g7da-mcat g7da-mcat--all' + (!query.diary_category ? ' is-on' : '')}}",
+        "className": "{{'g7da-mcat g7da-mcat--all' + (!query.diary_category && !query.diary_date ? ' is-on' : '')}}",
         "aria-label": "$t:g7-diary-addon.all",
-        "aria-pressed": "{{!query.diary_category ? 'true' : 'false'}}",
+        "aria-pressed": "{{!query.diary_category && !query.diary_date ? 'true' : 'false'}}",
         "data-g7da-tip": "$t:g7-diary-addon.all"
       },
       "actions": [
         {
           "type": "click",
           "handler": "navigate",
-          "params": { "path": "/board/{{route.slug}}", "mergeQuery": true, "query": { "diary_category": "", "page": 1 } }
+          "params": { "path": "/board/{{route.slug}}", "mergeQuery": true, "query": { "diary_category": "", "diary_date": "", "page": 1 } }
         }
       ],
       "children": [

@@ -25,7 +25,7 @@
     {
       "type": "basic",
       "name": "Button",
-      "if": "{{posts?.data?.diary?.display_mode === 'infinite' && ((_local.g7daMore?.key === (route.slug + '|' + (query.diary_category ?? '') + '|' + (query.search ?? '') + '|' + (posts?.data?.pagination?.current_page ?? 1))) ? _local.g7daMore.hasMore : posts?.data?.pagination?.has_more_pages) === true}}",
+      "if": "{{posts?.data?.diary?.display_mode === 'infinite' && ((_local.g7daMore?.key === (route.slug + '|' + (query.diary_category ?? '') + '|' + (query.diary_date ?? '') + '|' + (query.search ?? '') + '|' + (posts?.data?.pagination?.current_page ?? 1))) ? _local.g7daMore.hasMore : posts?.data?.pagination?.has_more_pages) === true}}",
       "props": {
         "type": "button",
         "className": "g7da-more",

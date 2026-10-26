@@ -5,27 +5,31 @@ namespace Plugins\G7\Diary\Addon\Listeners;
 use App\Contracts\Extension\HookListenerInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
-use Plugins\G7\Diary\Addon\Services\DiaryPostReader;
 use Plugins\G7\Diary\Addon\Support\DiaryBoards;
 use Plugins\G7\Diary\Addon\Support\DiaryCatalog;
 use Plugins\G7\Diary\Addon\Support\DiaryCategoryFilter;
+use Plugins\G7\Diary\Addon\Support\DiaryDateFilter;
+use Plugins\G7\Diary\Addon\Support\DiaryFilterSql;
 use Plugins\G7\Diary\Addon\Support\SecretVisibility;
+use Plugins\G7\Diary\Addon\Support\SiteClock;
 
 /**
- * Category filter of diary board lists — query parameter `diary_category` (D11 / D44).
+ * Filters of diary board lists — query parameters `diary_category` (D11 / D44) and
+ * `diary_date` (panel month calendar, bundle 3). Both together are ANDed.
  *
  * - `sirsoft-board.post.list_query_extensions`: on visitor lists of diary boards with a
- *   valid category id, narrows the list, the pinned rows and the count (contexts list,
- *   notice, count) by the steps of {@see DiaryCategoryFilter::plan()}.
+ *   valid category id and / or date, narrows the list, the pinned rows and the count
+ *   (contexts list, notice, count) by the plan steps ({@see DiaryCategoryFilter::plan()},
+ *   {@see DiaryDateFilter::step()}, run by {@see DiaryFilterSql}).
  * - `sirsoft-board.post.filter_list_cache_variant`: splits the post-count cache by the
- *   parts of {@see DiaryCategoryFilter::cacheParts()}. Nothing is returned for other
- *   boards or without the parameter, so their queries and cache keys stay as they were.
+ *   category / viewer parts and the date part. Nothing is returned for other boards or
+ *   without the parameters, so their queries and cache keys stay as they were.
  */
 class DiaryListFilterListener implements HookListenerInterface
 {
     public const PARAM = 'diary_category';
 
-    /** List contexts the filter applies to. */
+    /** List contexts the filters apply to. */
     public const CONTEXTS = ['list', 'notice', 'count'];
 
     public function __construct(
@@ -58,17 +62,18 @@ class DiaryListFilterListener implements HookListenerInterface
             return $conditions;
         }
 
-        $category = $this->requestedCategory();
-        if ($category === null) {
+        $plan = $this->plan((string) $board->slug);
+        if ($plan === []) {
             return $conditions;
         }
-
-        $others = $category === $this->catalog->defaultCategoryId()
-            ? array_values(array_diff(array_keys($this->catalog->categoriesById()), [$category]))
-            : null;
-        $plan = DiaryCategoryFilter::plan($category, $others, $this->visibility->isBoardWide((string) $board->slug), $this->viewerId());
         $conditions[] = static function (Builder $query) use ($plan): void {
-            self::applyPlan($query, $plan);
+            $model = $query->getModel();
+            DiaryFilterSql::apply($query, $plan, [
+                'id' => $model->qualifyColumn('id'),
+                'is_secret' => $model->qualifyColumn('is_secret'),
+                'user_id' => $model->qualifyColumn('user_id'),
+                'created_at' => $model->qualifyColumn('created_at'),
+            ]);
         };
 
         return $conditions;
@@ -85,12 +90,41 @@ class DiaryListFilterListener implements HookListenerInterface
             return $parts;
         }
         $slug = $this->boards->diarySlugOf($payload['board_id'] ?? null);
-        $category = $slug === null ? null : $this->requestedCategory();
-        if ($category === null) {
+        if ($slug === null) {
             return $parts;
         }
 
-        return array_merge($parts, DiaryCategoryFilter::cacheParts($category, $this->visibility->isBoardWide($slug), $this->viewerId()));
+        $category = $this->requestedCategory();
+        if ($category !== null) {
+            $parts = array_merge($parts, DiaryCategoryFilter::cacheParts($category, $this->visibility->isBoardWide($slug), $this->viewerId()));
+        }
+        $date = DiaryDateFilter::parse(request()->query(DiaryDateFilter::PARAM));
+        if ($date !== null) {
+            $parts[] = DiaryDateFilter::cachePart($date);
+        }
+
+        return $parts;
+    }
+
+    /**
+     * Plan steps of the requested filters for a diary board (empty without filters).
+     *
+     * @return array<int, array<int, mixed>>
+     */
+    private function plan(string $slug): array
+    {
+        $plan = [];
+        $category = $this->requestedCategory();
+        if ($category !== null) {
+            $others = DiaryCategoryFilter::othersFor($category, $this->catalog->defaultCategoryId(), array_keys($this->catalog->categoriesById()));
+            $plan = DiaryCategoryFilter::plan($category, $others, $this->visibility->isBoardWide($slug), $this->viewerId());
+        }
+        $date = DiaryDateFilter::parse(request()->query(DiaryDateFilter::PARAM));
+        if ($date !== null) {
+            $plan[] = DiaryDateFilter::step($date, SiteClock::timezone());
+        }
+
+        return $plan;
     }
 
     /**
@@ -111,29 +145,5 @@ class DiaryListFilterListener implements HookListenerInterface
         $id = Auth::id();
 
         return $id === null ? null : (int) $id;
-    }
-
-    /**
-     * @param  array<int, array<int, mixed>>  $plan
-     */
-    private static function applyPlan(Builder $query, array $plan): void
-    {
-        $model = $query->getModel();
-        $postId = $model->qualifyColumn('id');
-        $entries = static fn (string $op, mixed $value) => static fn ($sub) => $sub->select('post_id')->from(DiaryPostReader::ENTRIES)->{$op}('category_id', $value);
-
-        foreach ($plan as [$step, $value]) {
-            match ($step) {
-                'in_category' => $query->whereIn($postId, $entries('where', $value)),
-                'not_in_categories' => $query->whereNotIn($postId, $entries('whereIn', $value)),
-                'secret_visible_to' => $query->where(static function ($q) use ($model, $value): void {
-                    $q->where($model->qualifyColumn('is_secret'), false);
-                    if ($value !== null) {
-                        $q->orWhere($model->qualifyColumn('user_id'), $value);
-                    }
-                }),
-                default => null,
-            };
-        }
     }
 }

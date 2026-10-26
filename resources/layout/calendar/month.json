@@ -1,0 +1,57 @@
+{
+  "comment": "Month calendar: month moves, weekday head (Sunday red, Saturday blue), day cells on the representative category's light colour with the day number and EVERY post's category emoji (a lock for secret posts the viewer cannot open). Narrow screens show at most 2 emojis then '+N'. Today ringed; the chosen day ringed orange. A click shows that day's posts below.",
+  "type": "basic",
+  "name": "Div",
+  "props": { "id": "g7da-cal", "className": "g7da-cal", "data-testid": "g7da-cal" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-cal-nav g7da-cal-nav--big" },
+      "children": [
+        {
+          "type": "basic",
+          "name": "Button",
+          "props": { "type": "button", "className": "g7da-nav-btn", "aria-label": "$t:g7-diary-addon.prev_month", "data-g7da-tip": "$t:g7-diary-addon.prev_month", "data-testid": "g7da-cal-prev" },
+          "actions": [ { "type": "click", "handler": "navigate", "params": { "path": "/diary/{{route.slug}}/calendar", "replace": true, "mergeQuery": true, "query": { "month": "{{g7daMonth?.data?.prev}}" }, "scroll": "preserve", "refetch_data_sources": "g7daMonth" } } ],
+          "children": [ { "type": "basic", "name": "Icon", "props": { "name": "chevron-left", "aria-hidden": "true" } } ]
+        },
+        { "type": "basic", "name": "H2", "props": { "className": "g7da-cal-label" }, "text": "{{g7daMonth?.data?.label ?? ''}}" },
+        {
+          "type": "basic",
+          "name": "Button",
+          "props": { "type": "button", "className": "g7da-nav-btn", "aria-label": "$t:g7-diary-addon.next_month", "data-g7da-tip": "$t:g7-diary-addon.next_month", "data-testid": "g7da-cal-next" },
+          "actions": [ { "type": "click", "handler": "navigate", "params": { "path": "/diary/{{route.slug}}/calendar", "replace": true, "mergeQuery": true, "query": { "month": "{{g7daMonth?.data?.next}}" }, "scroll": "preserve", "refetch_data_sources": "g7daMonth" } } ],
+          "children": [ { "type": "basic", "name": "Icon", "props": { "name": "chevron-right", "aria-hidden": "true" } } ]
+        }
+      ]
+    },
+    { "g7da_include": "common/weekdays" },
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-cal-grid" },
+      "children": [
+        {
+          "type": "basic",
+          "name": "Button",
+          "iteration": { "source": "{{(g7daMonth?.data?.weeks ?? []).flat()}}", "item_var": "c" },
+          "props": {
+            "type": "button",
+            "className": "{{'g7da-cc' + (c.dow === 0 ? ' is-sun' : '') + (c.dow === 6 ? ' is-sat' : '') + (c.in_month ? '' : ' is-other') + (c.today ? ' is-today' : '') + (query.date === c.date ? ' is-sel' : '') + (c.locked_only ? ' is-locked' : '')}}",
+            "style": { "backgroundColor": "{{c.color && c.in_month ? c.color + '29' : ''}}" },
+            "aria-label": "{{c.tip}}",
+            "aria-pressed": "{{query.date === c.date ? 'true' : 'false'}}",
+            "data-g7da-date": "{{c.date}}"
+          },
+          "actions": [ { "type": "click", "handler": "navigate", "params": { "path": "/diary/{{route.slug}}/calendar", "replace": true, "mergeQuery": true, "query": { "month": "{{String(c.date).substring(0, 7)}}", "date": "{{c.date}}" }, "scroll": "preserve", "refetch_data_sources": ["g7daMonth", "g7daDay"] } } ],
+          "children": [
+            { "type": "basic", "name": "Span", "props": { "className": "g7da-cc-day" }, "text": "{{c.day}}" },
+            { "type": "basic", "name": "Span", "props": { "className": "g7da-cc-emo g7da-cc-emo--wide", "aria-hidden": "true" }, "text": "{{c.emojis.join('')}}" },
+            { "type": "basic", "name": "Span", "props": { "className": "g7da-cc-emo g7da-cc-emo--narrow", "aria-hidden": "true" }, "text": "{{c.emojis_narrow.join('') + (c.more_narrow > 0 ? '+' + c.more_narrow : '')}}" }
+          ]
+        }
+      ]
+    }
+  ]
+}

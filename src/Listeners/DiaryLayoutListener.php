@@ -7,13 +7,15 @@ use Illuminate\Support\Facades\Log;
 use Plugins\G7\Diary\Addon\Layout\Fragments;
 use Plugins\G7\Diary\Addon\Layout\FormInjector;
 use Plugins\G7\Diary\Addon\Layout\IndexInjector;
+use Plugins\G7\Diary\Addon\Layout\ScreenInjector;
 use Plugins\G7\Diary\Addon\Layout\ShowInjector;
 
 /**
  * Diary screens on the visitor template, without modifying it (D17).
  *
  * `core.layout_extension.after_apply` filter on the final tree of `board/index`,
- * `board/show` and `board/form`. The added nodes render only on diary boards (`if` on
+ * `board/show` and `board/form`, and of the plugin's own calendar / photo screens (their
+ * root node is filled from the fragments). The added nodes render only on diary boards (`if` on
  * the board type), nodes added by other add-ons are left in place, and an anchor that
  * cannot be found is logged as a warning while the layout is returned unchanged for that
  * part. Priority 30 runs after the forum / webzine listeners (20): the webzine listener
@@ -76,8 +78,13 @@ class DiaryLayoutListener implements HookListenerInterface
         return $layout;
     }
 
-    private function injectorFor(string $name): IndexInjector|ShowInjector|FormInjector|null
+    private function injectorFor(string $name): IndexInjector|ShowInjector|FormInjector|ScreenInjector|null
     {
+        $screen = ScreenInjector::screenOf($name);
+        if ($screen !== null) {
+            return new ScreenInjector(Fragments::plugin(), $screen);
+        }
+
         return match ($name) {
             'board/index' => new IndexInjector(Fragments::plugin()),
             'board/show' => new ShowInjector(Fragments::plugin()),

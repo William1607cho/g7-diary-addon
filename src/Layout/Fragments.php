@@ -76,6 +76,12 @@ final class Fragments
                 $node[$key] = $this->resolveList($node[$key], $depth);
             }
         }
+        // Lifecycle action lists (onMount, …) may include shared action fragments too.
+        foreach (is_array($node['lifecycle'] ?? null) ? $node['lifecycle'] : [] as $key => $list) {
+            if (is_array($list)) {
+                $node['lifecycle'][$key] = $this->resolveList($list, $depth);
+            }
+        }
 
         return $node;
     }

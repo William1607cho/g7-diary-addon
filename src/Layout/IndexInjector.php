@@ -37,10 +37,17 @@ final class IndexInjector
         return [$components, ['branch' => 'applied']];
     }
 
+    /** List filter parameters forwarded from the address to the list data source. */
+    public const FILTER_PARAMS = [
+        'diary_category' => "{{query.diary_category ?? ''}}",
+        'diary_date' => "{{query.diary_date ?? ''}}",
+    ];
+
     /**
-     * Forwards `diary_category` from the address to the list data source (D57). The template's
-     * `posts` source names its parameters one by one, so without this the filter never reaches
-     * the API. On other boards the value is empty and the filter listener ignores it.
+     * Forwards `diary_category` (D57) and `diary_date` (bundle 3) from the address to the list
+     * data source. The template's `posts` source names its parameters one by one, so without
+     * this the filters never reach the API. On other boards the values are empty and the filter
+     * listener ignores them.
      *
      * @param  array<int, mixed>  $sources  Layout `data_sources`.
      * @return array{0: array<int, mixed>, 1: string} applied|already|no_anchor
@@ -51,11 +58,11 @@ final class IndexInjector
             if (! is_array($source) || ($source['id'] ?? null) !== 'posts' || ! Tree::strHas($source['endpoint'] ?? null, '/boards/{{route.slug}}/posts')) {
                 continue;
             }
-            if (isset($source['params']['diary_category'])) {
+            $params = is_array($source['params'] ?? null) ? $source['params'] : [];
+            if (array_diff_key(self::FILTER_PARAMS, $params) === []) {
                 return [$sources, 'already'];
             }
-            $sources[$i]['params'] = (is_array($source['params'] ?? null) ? $source['params'] : [])
-                + ['diary_category' => "{{query.diary_category ?? ''}}"];
+            $sources[$i]['params'] = $params + self::FILTER_PARAMS;
 
             return [$sources, 'applied'];
         }

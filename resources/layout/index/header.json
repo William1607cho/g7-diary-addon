@@ -1,21 +1,45 @@
 {
-  "comment": "Top row: board name (no description) + icon buttons. Bundle 3 icons (calendar, photos, memories) have their slot here but are not shown yet.",
+  "comment": "Top row of the list and of the calendar / photo screens: board name (no description) + icon buttons, icons only (custom tooltip + aria-label). Order: search, calendar, photos, 지난 오늘, write (dark). On the screens (_local.g7daScreen set by their layout) a 'back to list' button sits left of the name, the board name comes from the summary API, the screen's own icon is on (orange), and search goes back to the list with the search row open. 지난 오늘: wide screens open the popup, narrow screens jump to one post (plugin script, data-g7da-memory-go). The row wraps on narrow screens.",
   "type": "basic",
   "name": "Div",
   "props": { "className": "g7da-head" },
   "children": [
     {
       "type": "basic",
-      "name": "H1",
-      "props": { "className": "g7da-title" },
-      "text": "{{posts?.data?.board?.name ?? ''}}"
+      "name": "Div",
+      "props": { "className": "g7da-head-main" },
+      "children": [
+        {
+          "type": "basic",
+          "name": "Button",
+          "if": "{{_local.g7daScreen}}",
+          "props": {
+            "type": "button",
+            "className": "g7da-icon-btn",
+            "aria-label": "$t:g7-diary-addon.back_to_list",
+            "data-g7da-tip": "$t:g7-diary-addon.back_to_list",
+            "data-testid": "g7da-back"
+          },
+          "actions": [
+            { "type": "click", "handler": "navigate", "params": { "path": "/board/{{route.slug}}", "query": { "diary_category": "{{query.diary_category ?? ''}}" } } }
+          ],
+          "children": [
+            { "type": "basic", "name": "Icon", "props": { "name": "list", "aria-hidden": "true" } }
+          ]
+        },
+        {
+          "type": "basic",
+          "name": "H1",
+          "props": { "className": "g7da-title" },
+          "text": "{{posts?.data?.board?.name ?? _local.g7daSummary?.board?.name ?? ''}}"
+        }
+      ]
     },
     {
       "type": "basic",
       "name": "Div",
       "props": { "className": "g7da-icons" },
       "children": [
-        { "g7da_slot": "bundle3_icons" },
         {
           "type": "basic",
           "name": "Button",
@@ -30,14 +54,19 @@
           "actions": [
             {
               "type": "click",
-              "handler": "setState",
-              "params": { "target": "local", "g7daSearchOpen": "{{!(_local.g7daSearchOpen || query.search)}}" }
+              "handler": "switch",
+              "params": { "value": "{{_local.g7daScreen ? 'list' : 'toggle'}}" },
+              "cases": {
+                "toggle": { "handler": "setState", "params": { "target": "local", "g7daSearchOpen": "{{!(_local.g7daSearchOpen || query.search)}}" } },
+                "list": { "handler": "navigate", "params": { "path": "/board/{{route.slug}}", "query": { "g7da_search": "1" } } }
+              }
             }
           ],
           "children": [
             { "type": "basic", "name": "Icon", "props": { "name": "search", "aria-hidden": "true" } }
           ]
         },
+        { "g7da_include": "common/nav-icons" },
         { "g7da_include": "index/write-button" }
       ]
     }

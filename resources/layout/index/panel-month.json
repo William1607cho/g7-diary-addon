@@ -1,0 +1,78 @@
+{
+  "comment": "Panel month calendar (wide screens), between the streak box and the categories. Data = the calendar API (same as the calendar screen), loaded with the list and on month moves. Day cells: representative category's light colour, today ringed, the date filter's day ringed orange. A day click filters the list to that diary date (diary_date in the address, AND with the category filter); 📖 All clears both.",
+  "type": "basic",
+  "name": "Div",
+  "props": { "className": "g7da-pcal", "data-testid": "g7da-pcal" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-cal-nav" },
+      "children": [
+        {
+          "type": "basic",
+          "name": "Button",
+          "props": { "type": "button", "className": "g7da-nav-btn", "aria-label": "$t:g7-diary-addon.prev_month", "data-g7da-tip": "$t:g7-diary-addon.prev_month", "data-testid": "g7da-pcal-prev" },
+          "actions": [
+            {
+              "type": "click",
+              "handler": "apiCall",
+              "auth_mode": "optional",
+              "target": "/api/plugins/g7-diary-addon/boards/{{route.slug}}/calendar",
+              "params": { "method": "GET", "query": { "month": "{{_local.g7daPcal?.prev ?? ''}}" } },
+              "onSuccess": [ { "handler": "setState", "params": { "target": "local", "g7daPcal": "{{response.data}}" } } ]
+            }
+          ],
+          "children": [ { "type": "basic", "name": "Icon", "props": { "name": "chevron-left", "aria-hidden": "true" } } ]
+        },
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-cal-label" }, "text": "{{_local.g7daPcal?.label ?? ''}}" },
+        {
+          "type": "basic",
+          "name": "Button",
+          "props": { "type": "button", "className": "g7da-nav-btn", "aria-label": "$t:g7-diary-addon.next_month", "data-g7da-tip": "$t:g7-diary-addon.next_month", "data-testid": "g7da-pcal-next" },
+          "actions": [
+            {
+              "type": "click",
+              "handler": "apiCall",
+              "auth_mode": "optional",
+              "target": "/api/plugins/g7-diary-addon/boards/{{route.slug}}/calendar",
+              "params": { "method": "GET", "query": { "month": "{{_local.g7daPcal?.next ?? ''}}" } },
+              "onSuccess": [ { "handler": "setState", "params": { "target": "local", "g7daPcal": "{{response.data}}" } } ]
+            }
+          ],
+          "children": [ { "type": "basic", "name": "Icon", "props": { "name": "chevron-right", "aria-hidden": "true" } } ]
+        }
+      ]
+    },
+    { "g7da_include": "common/weekdays" },
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-pcal-grid" },
+      "children": [
+        {
+          "type": "basic",
+          "name": "Button",
+          "iteration": { "source": "{{(_local.g7daPcal?.weeks ?? []).flat()}}", "item_var": "c" },
+          "props": {
+            "type": "button",
+            "className": "{{'g7da-pc' + (c.dow === 0 ? ' is-sun' : '') + (c.dow === 6 ? ' is-sat' : '') + (c.in_month ? '' : ' is-other') + (c.today ? ' is-today' : '') + (query.diary_date === c.date ? ' is-sel' : '') + (c.locked_only ? ' is-locked' : '')}}",
+            "style": { "backgroundColor": "{{c.color && c.in_month ? c.color + '33' : ''}}" },
+            "aria-label": "{{c.tip}}",
+            "aria-pressed": "{{query.diary_date === c.date ? 'true' : 'false'}}",
+            "data-g7da-tip": "{{c.tip}}",
+            "data-g7da-date": "{{c.date}}"
+          },
+          "actions": [
+            {
+              "type": "click",
+              "handler": "navigate",
+              "params": { "path": "/board/{{route.slug}}", "mergeQuery": true, "query": { "diary_date": "{{c.date}}", "page": 1 } }
+            }
+          ],
+          "text": "{{c.day}}"
+        }
+      ]
+    }
+  ]
+}

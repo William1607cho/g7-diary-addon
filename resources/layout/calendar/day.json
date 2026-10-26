@@ -1,0 +1,31 @@
+{
+  "comment": "Posts of the chosen day (address `date`): '10월 15일 목요일의 일기 N편', then one line each — category emoji, title (one line, …), weather — in writing order. Secret posts the viewer cannot open: lock + '비밀글'. A line opens the post. No posts: '이날은 기록이 없습니다'.",
+  "type": "basic",
+  "name": "Div",
+  "if": "{{query.date && g7daDay?.data}}",
+  "props": { "className": "g7da-day", "data-testid": "g7da-day" },
+  "children": [
+    { "type": "basic", "name": "H2", "props": { "className": "g7da-day-title" }, "text": "$t:g7-diary-addon.day_title|label={{g7daDay?.data?.label ?? ''}}|count={{g7daDay?.data?.count ?? 0}}" },
+    { "type": "basic", "name": "P", "if": "{{(g7daDay?.data?.count ?? 0) === 0}}", "props": { "className": "g7da-empty" }, "text": "$t:g7-diary-addon.day_empty" },
+    {
+      "type": "basic",
+      "name": "Div",
+      "if": "{{(g7daDay?.data?.count ?? 0) > 0}}",
+      "props": { "className": "g7da-day-list" },
+      "children": [
+        {
+          "type": "basic",
+          "name": "Button",
+          "iteration": { "source": "{{g7daDay?.data?.items ?? []}}", "item_var": "it" },
+          "props": { "type": "button", "className": "{{'g7da-day-row' + (it.locked ? ' is-locked' : '')}}", "data-g7da-post": "{{it.id}}" },
+          "actions": [ { "type": "click", "handler": "navigate", "params": { "path": "/board/{{route.slug}}/{{it.id}}" } } ],
+          "children": [
+            { "type": "basic", "name": "Span", "props": { "className": "g7da-day-emoji", "role": "img", "aria-label": "{{it.locked ? $t('g7-diary-addon.secret') : (it.category ?? '')}}" }, "text": "{{it.emoji}}" },
+            { "type": "basic", "name": "Span", "props": { "className": "g7da-day-text" }, "text": "{{it.locked ? $t('g7-diary-addon.secret') : it.title}}" },
+            { "type": "basic", "name": "Span", "if": "{{it.weather}}", "props": { "className": "g7da-day-weather", "role": "img", "aria-label": "{{it.weather?.label ?? ''}}" }, "text": "{{it.weather?.emoji ?? ''}}" }
+          ]
+        }
+      ]
+    }
+  ]
+}

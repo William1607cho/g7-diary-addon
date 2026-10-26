@@ -8,7 +8,7 @@
     {
       "type": "basic",
       "name": "P",
-      "text": "{{(query.search || query.diary_category) ? '$t:g7-diary-addon.empty_filtered' : '$t:g7-diary-addon.empty'}}"
+      "text": "{{(query.search || query.diary_category || query.diary_date) ? '$t:g7-diary-addon.empty_filtered' : '$t:g7-diary-addon.empty'}}"
     }
   ]
 }

@@ -1,0 +1,98 @@
+{
+  "comment": "지난 오늘 popup (wide screens): dimmed backdrop (click closes), centred dialog about 820px wide — title, one-line hint, close button; three cards (reason badge, category emoji, title, date with weekday, 3-line preview with fade, first photo on top); 'pick again' excludes the posts shown now. Missing places get the settings message card. Esc, focus kept inside and focus back to the icon are done by the plugin script.",
+  "type": "basic",
+  "name": "Div",
+  "if": "{{_local.g7daMemOpen}}",
+  "props": { "className": "g7da-mem-layer", "data-g7da": "memories" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-mem-backdrop", "data-testid": "g7da-mem-backdrop" },
+      "actions": [
+        { "type": "click", "handler": "setState", "params": { "target": "local", "g7daMemOpen": false } }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-mem-pop", "role": "dialog", "aria-modal": "true", "aria-labelledby": "g7da-mem-title", "tabIndex": -1, "data-testid": "g7da-mem-pop" },
+      "children": [
+        {
+          "type": "basic",
+          "name": "Div",
+          "props": { "className": "g7da-mem-head" },
+          "children": [
+            {
+              "type": "basic",
+              "name": "Div",
+              "children": [
+                { "type": "basic", "name": "H2", "props": { "id": "g7da-mem-title", "className": "g7da-mem-title" }, "text": "$t:g7-diary-addon.memories_title" },
+                { "type": "basic", "name": "P", "props": { "className": "g7da-mem-hint" }, "text": "$t:g7-diary-addon.memories_hint|date={{_local.g7daMem?.today_label ?? ''}}" }
+              ]
+            },
+            {
+              "type": "basic",
+              "name": "Button",
+              "props": { "type": "button", "className": "g7da-icon-btn", "aria-label": "$t:g7-diary-addon.close", "data-g7da-tip": "$t:g7-diary-addon.close", "data-g7da-mem-close": "1", "data-testid": "g7da-mem-close" },
+              "actions": [
+                { "type": "click", "handler": "setState", "params": { "target": "local", "g7daMemOpen": false } }
+              ],
+              "children": [
+                { "type": "basic", "name": "Icon", "props": { "name": "xmark", "aria-hidden": "true" } }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "basic",
+          "name": "P",
+          "if": "{{!_local.g7daMem}}",
+          "props": { "className": "g7da-mem-loading" },
+          "text": "$t:g7-diary-addon.loading"
+        },
+        {
+          "type": "basic",
+          "name": "Div",
+          "if": "{{_local.g7daMem}}",
+          "props": { "className": "g7da-mem-cards" },
+          "children": [
+            { "g7da_include": "common/memory-card" },
+            {
+              "type": "basic",
+              "name": "Div",
+              "iteration": { "source": "{{_local.g7daMem?.fill ?? []}}", "item_var": "f" },
+              "props": { "className": "g7da-mem-card is-empty", "data-testid": "g7da-mem-empty" },
+              "children": [
+                { "type": "basic", "name": "P", "text": "{{_local.g7daMem?.empty_text ?? ''}}" }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "basic",
+          "name": "Div",
+          "props": { "className": "g7da-mem-foot" },
+          "children": [
+            {
+              "type": "basic",
+              "name": "Button",
+              "props": { "type": "button", "className": "g7da-more", "disabled": "{{!_local.g7daMem}}", "data-testid": "g7da-mem-reroll" },
+              "actions": [
+                {
+                  "type": "click",
+                  "handler": "sequence",
+                  "actions": [
+                    { "handler": "setState", "params": { "target": "local", "g7daMemShown": "{{(_local.g7daMem?.items ?? []).map(function(i){ return i.id; })}}", "g7daMem": null } },
+                    { "g7da_include": "common/memories-fetch" }
+                  ]
+                }
+              ],
+              "text": "$t:g7-diary-addon.memories_reroll"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

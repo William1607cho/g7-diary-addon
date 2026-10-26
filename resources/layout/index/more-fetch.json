@@ -10,6 +10,7 @@
       "search": "{{query.search ?? ''}}",
       "category": "{{query.category ?? ''}}",
       "diary_category": "{{query.diary_category ?? ''}}",
+      "diary_date": "{{query.diary_date ?? ''}}",
       "del": "{{query.del ?? ''}}"
     }
   },

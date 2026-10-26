@@ -1,0 +1,10 @@
+{
+  "comment": "Summary API (board name / write permission, streak, category counts) into _local.g7daSummary.",
+  "handler": "apiCall",
+  "auth_mode": "optional",
+  "target": "/api/plugins/g7-diary-addon/boards/{{route.slug}}/summary",
+  "params": { "method": "GET" },
+  "onSuccess": [
+    { "handler": "setState", "params": { "target": "local", "g7daSummary": "{{response.data}}" } }
+  ]
+}

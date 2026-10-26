@@ -10,16 +10,15 @@
   },
   "lifecycle": {
     "onMount": [
+      { "g7da_include": "common/summary-fetch" },
       {
+        "comment": "Panel month calendar (wide screens): the month of the date filter, else this month.",
         "handler": "apiCall",
         "auth_mode": "optional",
-        "target": "/api/plugins/g7-diary-addon/boards/{{route.slug}}/summary",
-        "params": { "method": "GET" },
+        "target": "/api/plugins/g7-diary-addon/boards/{{route.slug}}/calendar",
+        "params": { "method": "GET", "query": { "month": "{{query.diary_date ? String(query.diary_date).substring(0, 7) : ''}}" } },
         "onSuccess": [
-          {
-            "handler": "setState",
-            "params": { "target": "local", "g7daSummary": "{{response.data}}" }
-          }
+          { "handler": "setState", "params": { "target": "local", "g7daPcal": "{{response.data}}" } }
         ]
       }
     ]
@@ -31,6 +30,7 @@
     { "g7da_include": "index/cards" },
     { "g7da_include": "index/empty" },
     { "g7da_include": "index/pager" },
-    { "g7da_include": "index/panel" }
+    { "g7da_include": "index/panel" },
+    { "g7da_include": "common/memories" }
   ]
 }

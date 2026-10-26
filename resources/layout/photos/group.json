@@ -1,0 +1,35 @@
+{
+  "comment": "One month group of the gallery page. A month cut by a page boundary starts the next page (or the next appended chunk) with its heading again; the heading count is the whole month's.",
+  "type": "basic",
+  "name": "Div",
+  "iteration": { "source": "{{g7daPhotos?.data?.groups ?? []}}", "item_var": "g" },
+  "props": { "className": "g7da-pgroup", "data-g7da-month": "{{g.month}}" },
+  "children": [
+    { "type": "basic", "name": "H2", "props": { "className": "g7da-pgroup-title" }, "text": "$t:g7-diary-addon.photos_group|month={{g.label}}|count={{g.total}}" },
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-pgrid" },
+      "children": [
+        {
+          "type": "basic",
+          "name": "Button",
+          "iteration": { "source": "{{g.cells}}", "item_var": "c" },
+          "props": {
+            "type": "button",
+            "className": "{{'g7da-pcell' + (c.locked ? ' is-locked' : '')}}",
+            "aria-label": "{{c.date_label + ' ' + (c.locked ? $t('g7-diary-addon.secret') : (c.category ?? ''))}}",
+            "data-g7da-post": "{{c.post_id}}"
+          },
+          "actions": [ { "type": "click", "handler": "navigate", "params": { "path": "/board/{{route.slug}}/{{c.post_id}}" } } ],
+          "children": [
+            { "type": "basic", "name": "Img", "if": "{{!c.locked && c.src}}", "props": { "src": "{{c.src}}", "alt": "", "loading": "lazy", "decoding": "async" } },
+            { "type": "basic", "name": "Span", "if": "{{c.locked}}", "props": { "className": "g7da-plock", "aria-hidden": "true" }, "children": [ { "type": "basic", "name": "Icon", "props": { "name": "lock", "aria-hidden": "true" } } ] },
+            { "type": "basic", "name": "Span", "props": { "className": "g7da-pbadge g7da-pbadge--cat", "aria-hidden": "true" }, "text": "{{c.emoji}}" },
+            { "type": "basic", "name": "Span", "props": { "className": "g7da-pbadge g7da-pbadge--date", "aria-hidden": "true" }, "text": "{{c.date_label}}" }
+          ]
+        }
+      ]
+    }
+  ]
+}

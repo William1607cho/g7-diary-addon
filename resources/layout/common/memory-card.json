@@ -1,0 +1,53 @@
+{
+  "comment": "One 지난 오늘 card. The title button is stretched over the card (as the list cards, D43), so a click anywhere opens the post. First photo on top when there is one; the preview is clamped to 3 lines with a fade.",
+  "type": "basic",
+  "name": "Div",
+  "iteration": { "source": "{{_local.g7daMem?.items ?? []}}", "item_var": "m" },
+  "props": { "className": "g7da-mem-card", "data-testid": "g7da-mem-card", "data-g7da-post": "{{m.id}}" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Div",
+      "if": "{{m.photo}}",
+      "props": { "className": "g7da-mem-photo" },
+      "children": [
+        { "type": "basic", "name": "Img", "props": { "src": "{{m.photo}}", "alt": "", "loading": "lazy", "decoding": "async" } }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-mem-badges" },
+      "children": [
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-mem-reason" }, "text": "{{m.reason_label}}" },
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-mem-emoji", "role": "img", "aria-label": "{{m.category ?? ''}}" }, "text": "{{m.emoji}}" }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Button",
+      "props": { "type": "button", "className": "g7da-mem-link" },
+      "actions": [
+        {
+          "type": "click",
+          "handler": "sequence",
+          "actions": [
+            { "handler": "setState", "params": { "target": "local", "g7daMemOpen": false } },
+            { "handler": "navigate", "params": { "path": "/board/{{route.slug}}/{{m.id}}" } }
+          ]
+        }
+      ],
+      "text": "{{m.title}}"
+    },
+    { "type": "basic", "name": "P", "props": { "className": "g7da-mem-date" }, "text": "{{m.date_long}}" },
+    {
+      "type": "basic",
+      "name": "Div",
+      "if": "{{m.preview_html}}",
+      "props": { "className": "g7da-mem-preview" },
+      "children": [
+        { "type": "composite", "name": "HtmlContent", "props": { "content": "{{m.preview_html ?? ''}}", "isHtml": true, "className": "g7da-preview-body" } }
+      ]
+    }
+  ]
+}

@@ -4,9 +4,45 @@
   "extends": "_user_base",
   "meta": {
     "title": "$t:g7-diary-addon.calendar_title",
-    "description": "g7-diary-addon: diary calendar screen. The content node is filled by the add-on's layout listener from resources/layout/calendar/*.json (D49); search rendering is off (bots get the app shell).",
+    "description": "g7-diary-addon: diary calendar screen. The content node is filled by the add-on's layout listener from resources/layout/calendar/*.json (D49); search rendering is off (bots get the app shell, D78).",
     "seo": { "enabled": false }
   },
+  "initLocal": { "g7daScreen": "calendar" },
+  "data_sources": [
+    {
+      "id": "g7daHeat",
+      "type": "api",
+      "endpoint": "/api/plugins/g7-diary-addon/boards/{{route.slug}}/heatmap",
+      "method": "GET",
+      "params": { "year": "{{query.year ?? ''}}" },
+      "auto_fetch": true,
+      "auth_mode": "optional",
+      "errorHandling": {
+        "401": { "handler": "sequence", "actions": [ { "handler": "toast", "params": { "type": "info", "message": "$t:board.login_required" } }, { "handler": "redirectToLoginWithReturn" } ] },
+        "403": { "handler": "showErrorPage", "params": { "target": "content" } },
+        "404": { "handler": "showErrorPage", "params": { "target": "content" } }
+      }
+    },
+    {
+      "id": "g7daMonth",
+      "type": "api",
+      "endpoint": "/api/plugins/g7-diary-addon/boards/{{route.slug}}/calendar",
+      "method": "GET",
+      "params": { "month": "{{query.month ?? ''}}" },
+      "auto_fetch": true,
+      "auth_mode": "optional"
+    },
+    {
+      "id": "g7daDay",
+      "type": "api",
+      "endpoint": "/api/plugins/g7-diary-addon/boards/{{route.slug}}/day",
+      "method": "GET",
+      "params": { "date": "{{query.date ?? ''}}" },
+      "if": "{{query.date}}",
+      "auto_fetch": true,
+      "auth_mode": "optional"
+    }
+  ],
   "slots": {
     "content": [
       {

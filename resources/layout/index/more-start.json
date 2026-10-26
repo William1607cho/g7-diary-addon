@@ -4,8 +4,8 @@
   "params": {
     "target": "local",
     "g7daMore": {
-      "key": "{{route.slug + '|' + (query.diary_category ?? '') + '|' + (query.search ?? '') + '|' + (posts?.data?.pagination?.current_page ?? 1)}}",
-      "page": "{{_local.g7daMore?.key === (route.slug + '|' + (query.diary_category ?? '') + '|' + (query.search ?? '') + '|' + (posts?.data?.pagination?.current_page ?? 1)) ? _local.g7daMore.page : (posts?.data?.pagination?.current_page ?? 1)}}",
+      "key": "{{route.slug + '|' + (query.diary_category ?? '') + '|' + (query.diary_date ?? '') + '|' + (query.search ?? '') + '|' + (posts?.data?.pagination?.current_page ?? 1)}}",
+      "page": "{{_local.g7daMore?.key === (route.slug + '|' + (query.diary_category ?? '') + '|' + (query.diary_date ?? '') + '|' + (query.search ?? '') + '|' + (posts?.data?.pagination?.current_page ?? 1)) ? _local.g7daMore.page : (posts?.data?.pagination?.current_page ?? 1)}}",
       "hasMore": true,
       "loading": true,
       "failed": false

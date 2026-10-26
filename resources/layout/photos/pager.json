@@ -1,0 +1,77 @@
+{
+  "comment": "Gallery paging by the 'photo display mode' setting. Page turning: previous / next page by month cursor in the address (cursor), 'page / pages'. Infinite: next chunks appended (appendDataSource on data.groups); state _local.g7daPm = {key, next, hasMore, loading, failed}, key = board|category|first cursor. The plugin script clicks the button when it comes into view (data-g7da-more=auto); after a failed load it stays as a 'more' button.",
+  "type": "basic",
+  "name": "Div",
+  "if": "{{(g7daPhotos?.data?.total ?? 0) > 0}}",
+  "props": { "className": "g7da-pager" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Div",
+      "if": "{{g7daPhotos?.data?.display_mode !== 'infinite' && (g7daPhotos?.data?.pages ?? 1) > 1}}",
+      "props": { "className": "g7da-ppager", "data-testid": "g7da-photos-pages" },
+      "children": [
+        {
+          "type": "basic",
+          "name": "Button",
+          "props": { "type": "button", "className": "g7da-more", "disabled": "{{!g7daPhotos?.data?.prev_cursor}}", "data-testid": "g7da-photos-prev" },
+          "actions": [ { "type": "click", "handler": "navigate", "params": { "path": "/diary/{{route.slug}}/photos", "mergeQuery": true, "query": { "cursor": "{{g7daPhotos?.data?.prev_cursor ?? ''}}" } } } ],
+          "text": "$t:g7-diary-addon.prev_page"
+        },
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-ppage" }, "text": "{{(g7daPhotos?.data?.page ?? 1) + ' / ' + (g7daPhotos?.data?.pages ?? 1)}}" },
+        {
+          "type": "basic",
+          "name": "Button",
+          "props": { "type": "button", "className": "g7da-more", "disabled": "{{!g7daPhotos?.data?.next_cursor}}", "data-testid": "g7da-photos-next" },
+          "actions": [ { "type": "click", "handler": "navigate", "params": { "path": "/diary/{{route.slug}}/photos", "mergeQuery": true, "query": { "cursor": "{{g7daPhotos?.data?.next_cursor ?? ''}}" } } } ],
+          "text": "$t:g7-diary-addon.next_page"
+        }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Button",
+      "if": "{{g7daPhotos?.data?.display_mode === 'infinite' && ((_local.g7daPm?.key === (route.slug + '|' + (query.diary_category ?? '') + '|' + (query.cursor ?? ''))) ? _local.g7daPm.hasMore : g7daPhotos?.data?.has_more) === true}}",
+      "props": {
+        "type": "button",
+        "className": "g7da-more",
+        "disabled": "{{_local.g7daPm?.loading === true}}",
+        "data-g7da-more": "{{_local.g7daPm?.failed ? 'manual' : 'auto'}}",
+        "data-testid": "g7da-photos-more"
+      },
+      "actions": [
+        {
+          "type": "click",
+          "handler": "sequence",
+          "actions": [
+            {
+              "handler": "setState",
+              "params": {
+                "target": "local",
+                "g7daPm": {
+                  "key": "{{route.slug + '|' + (query.diary_category ?? '') + '|' + (query.cursor ?? '')}}",
+                  "next": "{{_local.g7daPm?.key === (route.slug + '|' + (query.diary_category ?? '') + '|' + (query.cursor ?? '')) ? _local.g7daPm.next : g7daPhotos?.data?.next_cursor}}",
+                  "hasMore": true,
+                  "loading": true,
+                  "failed": false
+                }
+              }
+            },
+            {
+              "handler": "apiCall",
+              "auth_mode": "optional",
+              "target": "/api/plugins/g7-diary-addon/boards/{{route.slug}}/photos",
+              "params": { "method": "GET", "query": { "cursor": "{{_local.g7daPm?.next ?? ''}}", "diary_category": "{{query.diary_category ?? ''}}" } },
+              "onSuccess": [
+                { "handler": "appendDataSource", "params": { "dataSourceId": "g7daPhotos", "dataPath": "data.groups", "newData": "{{response?.data?.groups ?? []}}" } },
+                { "handler": "setState", "params": { "target": "local", "g7daPm": { "next": "{{response?.data?.next_cursor ?? null}}", "hasMore": "{{response?.data?.has_more === true}}", "loading": false, "failed": false } } }
+              ],
+              "onError": [ { "handler": "setState", "params": { "target": "local", "g7daPm": { "loading": false, "failed": true } } } ]
+            }
+          ]
+        }
+      ],
+      "text": "{{_local.g7daPm?.loading ? '$t:g7-diary-addon.loading' : '$t:g7-diary-addon.more'}}"
+    }
+  ]
+}

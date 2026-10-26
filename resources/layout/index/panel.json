@@ -1,5 +1,5 @@
 {
-  "comment": "Wide screens only (CSS): a half-round tab fixed at the left edge, vertical centre, opens / closes the panel (the only way to close it — no X, no outside click, no overlay). The panel slides out into the space left of the list. Contents: streak box, (bundle 3: month calendar slot), category buttons 3 per row. Choosing a category keeps the panel open.",
+  "comment": "Wide screens only (CSS): a half-round tab fixed at the left edge, vertical centre, opens / closes the panel (the only way to close it — no X, no outside click, no overlay). The panel slides out into the space left of the list. Contents: streak box, month calendar (date filter), category buttons 3 per row. Choosing a category keeps the panel open.",
   "type": "basic",
   "name": "Div",
   "props": { "className": "g7da-panel-root" },
@@ -35,7 +35,7 @@
       },
       "children": [
         { "g7da_include": "index/panel-streak" },
-        { "g7da_slot": "bundle3_month_calendar" },
+        { "g7da_include": "index/panel-month" },
         { "g7da_include": "index/panel-categories" }
       ]
     }

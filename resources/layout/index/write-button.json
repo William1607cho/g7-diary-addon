@@ -1,5 +1,5 @@
 {
-  "comment": "Write button — same permission / login flow as the template's list write button (partials/board/index/_write_button.json), dark accent, custom tooltip instead of title.",
+  "comment": "Write button — same permission / login flow as the template's list write button (partials/board/index/_write_button.json), dark accent, custom tooltip instead of title. On the calendar / photo screens (no list response) the permission comes from the summary API (same sirsoft-board check).",
   "type": "basic",
   "name": "Button",
   "props": {
@@ -8,14 +8,14 @@
     "aria-label": "$t:g7-diary-addon.write",
     "data-g7da-tip": "$t:g7-diary-addon.write",
     "data-testid": "g7da-write",
-    "disabled": "{{posts?.data?.abilities?.can_write !== true}}"
+    "disabled": "{{(posts?.data?.abilities?.can_write ?? _local.g7daSummary?.board?.can_write) !== true}}"
   },
   "actions": [
     {
       "type": "click",
       "handler": "switch",
       "params": {
-        "value": "{{posts?.data?.abilities?.can_write ? 'allowed' : (_global.currentUser?.uuid ? 'no_permission' : 'not_logged_in')}}"
+        "value": "{{(posts?.data?.abilities?.can_write ?? _local.g7daSummary?.board?.can_write) ? 'allowed' : (_global.currentUser?.uuid ? 'no_permission' : 'not_logged_in')}}"
       },
       "cases": {
         "allowed": {

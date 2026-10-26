@@ -1,0 +1,19 @@
+{
+  "comment": "지난 오늘 (wide popup): 3 picks; 'pick again' passes the posts shown now as exclude. On error the popup shows the message cards only.",
+  "handler": "apiCall",
+  "auth_mode": "optional",
+  "target": "/api/plugins/g7-diary-addon/boards/{{route.slug}}/memories",
+  "params": {
+    "method": "GET",
+    "query": {
+      "count": 3,
+      "exclude": "{{(_local.g7daMemShown ?? []).join(',')}}"
+    }
+  },
+  "onSuccess": [
+    { "handler": "setState", "params": { "target": "local", "g7daMem": "{{response.data}}", "g7daMemShown": [] } }
+  ],
+  "onError": [
+    { "handler": "setState", "params": { "target": "local", "g7daMem": { "items": [], "fill": [1, 1, 1], "empty_text": "" }, "g7daMemShown": [] } }
+  ]
+}

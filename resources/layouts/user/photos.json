@@ -4,9 +4,26 @@
   "extends": "_user_base",
   "meta": {
     "title": "$t:g7-diary-addon.photos_title",
-    "description": "g7-diary-addon: diary photo gallery screen. The content node is filled by the add-on's layout listener from resources/layout/photos/*.json (D49); search rendering is off (bots get the app shell).",
+    "description": "g7-diary-addon: diary photo gallery screen. The content node is filled by the add-on's layout listener from resources/layout/photos/*.json (D49); search rendering is off (bots get the app shell, D78).",
     "seo": { "enabled": false }
   },
+  "initLocal": { "g7daScreen": "photos" },
+  "data_sources": [
+    {
+      "id": "g7daPhotos",
+      "type": "api",
+      "endpoint": "/api/plugins/g7-diary-addon/boards/{{route.slug}}/photos",
+      "method": "GET",
+      "params": { "cursor": "{{query.cursor ?? ''}}", "diary_category": "{{query.diary_category ?? ''}}" },
+      "auto_fetch": true,
+      "auth_mode": "optional",
+      "errorHandling": {
+        "401": { "handler": "sequence", "actions": [ { "handler": "toast", "params": { "type": "info", "message": "$t:board.login_required" } }, { "handler": "redirectToLoginWithReturn" } ] },
+        "403": { "handler": "showErrorPage", "params": { "target": "content" } },
+        "404": { "handler": "showErrorPage", "params": { "target": "content" } }
+      }
+    }
+  ],
   "slots": {
     "content": [
       {

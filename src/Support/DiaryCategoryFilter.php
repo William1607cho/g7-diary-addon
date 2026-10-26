@@ -35,6 +35,18 @@ final class DiaryCategoryFilter
     }
 
     /**
+     * The `$others` argument of {@see self::plan()}: for the default category, the other
+     * active category ids; null for any other category.
+     *
+     * @param  array<int, int>  $activeIds
+     * @return array<int, int>|null
+     */
+    public static function othersFor(int $category, ?int $defaultId, array $activeIds): ?array
+    {
+        return $category === $defaultId ? array_values(array_diff(array_map('intval', $activeIds), [$category])) : null;
+    }
+
+    /**
      * Count-cache parts: the category and who is looking (the filtered count differs per
      * viewer — board managers share one key, members get their own, guests one).
      *

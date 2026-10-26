@@ -1,0 +1,22 @@
+{
+  "comment": "Active category filter carried over from the list (diary_category): emoji + name chip with a clear button (D84).",
+  "type": "basic",
+  "name": "Div",
+  "if": "{{query.diary_category}}",
+  "props": { "className": "g7da-pfilter", "data-testid": "g7da-photos-filter" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Span",
+      "props": { "className": "g7da-pfilter-chip" },
+      "text": "{{((_local.g7daSummary?.categories ?? []).find(function(c){ return String(c.id) === String(query.diary_category); }) ?? {}).emoji ?? ''}} {{((_local.g7daSummary?.categories ?? []).find(function(c){ return String(c.id) === String(query.diary_category); }) ?? {}).name ?? ''}}"
+    },
+    {
+      "type": "basic",
+      "name": "Button",
+      "props": { "type": "button", "className": "g7da-nav-btn", "aria-label": "$t:g7-diary-addon.all", "data-g7da-tip": "$t:g7-diary-addon.all", "data-testid": "g7da-photos-filter-clear" },
+      "actions": [ { "type": "click", "handler": "navigate", "params": { "path": "/diary/{{route.slug}}/photos", "query": { "diary_category": "" } } } ],
+      "children": [ { "type": "basic", "name": "Icon", "props": { "name": "xmark", "aria-hidden": "true" } } ]
+    }
+  ]
+}

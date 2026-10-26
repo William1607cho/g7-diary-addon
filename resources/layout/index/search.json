@@ -2,7 +2,7 @@
   "comment": "Search row, opened by the search icon (or shown while a search is active). Same search as the board list (query.search, page 1); the category filter stays in the address.",
   "type": "basic",
   "name": "Div",
-  "if": "{{_local.g7daSearchOpen || query.search}}",
+  "if": "{{_local.g7daSearchOpen || query.search || query.g7da_search}}",
   "props": { "className": "g7da-search" },
   "children": [
     {

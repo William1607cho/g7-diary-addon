@@ -106,7 +106,7 @@ class DiaryPostReader
             ->where('slug', $slug)
             ->where('type', DiaryBoards::TYPE)
             ->where('is_active', 1)
-            ->first(['id', 'slug', 'is_active']);
+            ->first(['id', 'slug', 'name', 'is_active']);
     }
 
     /**

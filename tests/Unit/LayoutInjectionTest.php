@@ -171,7 +171,7 @@ class LayoutInjectionTest extends TestCase
         [$out, $r] = IndexInjector::withFilterParam($sources);
 
         $this->assertSame('applied', $r);
-        $this->assertSame(['page' => '{{query.page ?? 1}}', 'diary_category' => "{{query.diary_category ?? ''}}"], $out[1]['params']);
+        $this->assertSame(['page' => '{{query.page ?? 1}}', 'diary_category' => "{{query.diary_category ?? ''}}", 'diary_date' => "{{query.diary_date ?? ''}}"], $out[1]['params']);
         $this->assertSame($sources[0], $out[0]);
         $this->assertSame('already', IndexInjector::withFilterParam($out)[1]);
         $this->assertSame('no_anchor', IndexInjector::withFilterParam([$sources[0]])[1]);

@@ -13,15 +13,15 @@
       "name": "Button",
       "props": {
         "type": "button",
-        "className": "{{'g7da-pcat g7da-pcat--all' + (!query.diary_category ? ' is-on' : '')}}",
-        "aria-pressed": "{{!query.diary_category ? 'true' : 'false'}}",
+        "className": "{{'g7da-pcat g7da-pcat--all' + (!query.diary_category && !query.diary_date ? ' is-on' : '')}}",
+        "aria-pressed": "{{!query.diary_category && !query.diary_date ? 'true' : 'false'}}",
         "aria-label": "{{$t('g7-diary-addon.all') + ' ' + (_local.g7daSummary?.total ?? 0)}}"
       },
       "actions": [
         {
           "type": "click",
           "handler": "navigate",
-          "params": { "path": "/board/{{route.slug}}", "mergeQuery": true, "query": { "diary_category": "", "page": 1 } }
+          "params": { "path": "/board/{{route.slug}}", "mergeQuery": true, "query": { "diary_category": "", "diary_date": "", "page": 1 } }
         }
       ],
       "children": [

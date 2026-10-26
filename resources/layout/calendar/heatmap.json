@@ -1,0 +1,107 @@
+{
+  "comment": "Year heatmap (wide screens only — CSS): week columns (53, 54 in rare years — D79) × 7 days, month labels on top, year moves, 'N entries this year'. Cell colour = the day's representative category (most posts; tie → the one written last; secret posts the viewer cannot open do not count — D6); no entry = light grey, days to come lighter, today ringed. Custom tooltip (not on touch). A click moves the month calendar to that month and selects the day.",
+  "type": "basic",
+  "name": "Div",
+  "props": { "className": "g7da-heat", "data-testid": "g7da-heat" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-heat-head" },
+      "children": [
+        {
+          "type": "basic",
+          "name": "Div",
+          "props": { "className": "g7da-cal-nav" },
+          "children": [
+            {
+              "type": "basic",
+              "name": "Button",
+              "props": { "type": "button", "className": "g7da-nav-btn", "aria-label": "$t:g7-diary-addon.prev_year", "data-g7da-tip": "$t:g7-diary-addon.prev_year", "data-testid": "g7da-heat-prev" },
+              "actions": [ { "type": "click", "handler": "navigate", "params": { "path": "/diary/{{route.slug}}/calendar", "replace": true, "mergeQuery": true, "query": { "year": "{{g7daHeat?.data?.prev_year}}" }, "scroll": "preserve", "refetch_data_sources": "g7daHeat" } } ],
+              "children": [ { "type": "basic", "name": "Icon", "props": { "name": "chevron-left", "aria-hidden": "true" } } ]
+            },
+            { "type": "basic", "name": "Span", "props": { "className": "g7da-cal-label" }, "text": "{{g7daHeat?.data?.year ?? ''}}년" },
+            {
+              "type": "basic",
+              "name": "Button",
+              "props": { "type": "button", "className": "g7da-nav-btn", "aria-label": "$t:g7-diary-addon.next_year", "data-g7da-tip": "$t:g7-diary-addon.next_year", "data-testid": "g7da-heat-next" },
+              "actions": [ { "type": "click", "handler": "navigate", "params": { "path": "/diary/{{route.slug}}/calendar", "replace": true, "mergeQuery": true, "query": { "year": "{{g7daHeat?.data?.next_year}}" }, "scroll": "preserve", "refetch_data_sources": "g7daHeat" } } ],
+              "children": [ { "type": "basic", "name": "Icon", "props": { "name": "chevron-right", "aria-hidden": "true" } } ]
+            }
+          ]
+        },
+        { "type": "basic", "name": "Span", "if": "{{g7daHeat?.data?.this_year}}", "props": { "className": "g7da-heat-total" }, "text": "$t:g7-diary-addon.year_total_this|count={{g7daHeat?.data?.total ?? 0}}" },
+        { "type": "basic", "name": "Span", "if": "{{g7daHeat?.data && !g7daHeat?.data?.this_year}}", "props": { "className": "g7da-heat-total" }, "text": "$t:g7-diary-addon.year_total|year={{g7daHeat?.data?.year ?? ''}}|count={{g7daHeat?.data?.total ?? 0}}" }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-heat-grid" },
+      "children": [
+        {
+          "type": "basic",
+          "name": "Div",
+          "iteration": { "source": "{{g7daHeat?.data?.columns ?? []}}", "item_var": "col" },
+          "props": { "className": "g7da-heat-col" },
+          "children": [
+            { "type": "basic", "name": "Span", "props": { "className": "g7da-heat-mon" }, "text": "{{col.month}}" },
+            {
+              "type": "basic",
+              "name": "Button",
+              "iteration": { "source": "{{col.days}}", "item_var": "d" },
+              "props": {
+                "type": "button",
+                "className": "{{'g7da-hc' + (d.out ? ' is-out' : '') + (!d.out && d.count === 0 ? ' is-empty' : '') + (d.future ? ' is-future' : '') + (d.today ? ' is-today' : '') + (d.locked_only ? ' is-locked' : '')}}",
+                "style": { "backgroundColor": "{{d.color ?? ''}}" },
+                "disabled": "{{d.out === true}}",
+                "aria-label": "{{d.tip ?? ''}}",
+                "data-g7da-tip": "{{d.tip ?? ''}}",
+                "data-g7da-date": "{{d.date ?? ''}}"
+              },
+              "actions": [ { "type": "click", "handler": "navigate", "params": { "path": "/diary/{{route.slug}}/calendar", "replace": true, "mergeQuery": true, "query": { "month": "{{String(d.date).substring(0, 7)}}", "date": "{{d.date}}" }, "scroll": "preserve", "refetch_data_sources": ["g7daMonth", "g7daDay"] } } ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-legend" },
+      "children": [
+        {
+          "type": "basic",
+          "name": "Span",
+          "iteration": { "source": "{{g7daHeat?.data?.legend ?? []}}", "item_var": "lg" },
+          "props": { "className": "g7da-legend-item" },
+          "children": [
+            { "type": "basic", "name": "Span", "props": { "className": "g7da-swatch", "style": { "backgroundColor": "{{lg.color}}" }, "aria-hidden": "true" } },
+            { "type": "basic", "name": "Span", "text": "{{lg.emoji + ' ' + lg.name}}" }
+          ]
+        },
+        {
+          "type": "basic",
+          "name": "Span",
+          "if": "{{g7daHeat?.data?.has_locked}}",
+          "props": { "className": "g7da-legend-item" },
+          "children": [
+            { "type": "basic", "name": "Span", "props": { "className": "g7da-swatch is-locked", "aria-hidden": "true" } },
+            { "type": "basic", "name": "Span", "props": { "aria-hidden": "true" }, "text": "🔒" },
+            { "type": "basic", "name": "Span", "text": "$t:g7-diary-addon.secret" }
+          ]
+        },
+        {
+          "type": "basic",
+          "name": "Span",
+          "props": { "className": "g7da-legend-item" },
+          "children": [
+            { "type": "basic", "name": "Span", "props": { "className": "g7da-swatch is-empty", "aria-hidden": "true" } },
+            { "type": "basic", "name": "Span", "text": "$t:g7-diary-addon.no_record" }
+          ]
+        }
+      ]
+    }
+  ]
+}
