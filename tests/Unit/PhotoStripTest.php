@@ -7,7 +7,7 @@ use Plugins\G7\Diary\Addon\Support\DiaryCategories;
 use Plugins\G7\Diary\Addon\Support\PhotoStrip;
 
 /**
- * D64 photo row cells and "+N" covers; D63 default category rename rule.
+ * D64 photo row cells and "+N" covers; D63 seed name of category 3.
  */
 class PhotoStripTest extends TestCase
 {
@@ -56,13 +56,12 @@ class PhotoStripTest extends TestCase
         $this->assertSame(4, count(PhotoStrip::urls(self::H)));
     }
 
-    public function test_category_rename_only_from_the_old_default(): void
+    public function test_new_install_seed_names_category_three_anger_diary(): void
     {
-        $this->assertSame('{"ko":"분노일기"}', DiaryCategories::renamedJson('{"ko":"개빡치는 날"}', '개빡치는 날', '분노일기'));
-        $this->assertNull(DiaryCategories::renamedJson('{"ko":"화난 날"}', '개빡치는 날', '분노일기'));          // changed by the site
-        $this->assertNull(DiaryCategories::renamedJson('{"ko":"분노일기"}', '개빡치는 날', '분노일기'));         // already renamed
-        $this->assertNull(DiaryCategories::renamedJson('{"ko":"개빡치는 날","en":"Angry"}', '개빡치는 날', '분노일기')); // extended by the site
-        $this->assertNull(DiaryCategories::renamedJson('not json', '개빡치는 날', '분노일기'));
+        // D63 (bundle 2 instruction 3): only the seed default changes; existing installs keep their name.
+        $this->assertSame(3, DiaryCategories::DEFAULTS[2]['id']);
         $this->assertSame('분노일기', DiaryCategories::DEFAULTS[2]['name']);
+        $this->assertSame('😡', DiaryCategories::DEFAULTS[2]['icon']);
+        $this->assertSame('#EF4444', DiaryCategories::DEFAULTS[2]['color']);
     }
 }

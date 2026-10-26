@@ -59,40 +59,6 @@ class DiaryCategories
     }
 
     /**
-     * Renames a default category only while its stored name is still the old default (D63).
-     * A name the site changed is left alone. One conditional UPDATE on the row id.
-     *
-     * @return bool Renamed.
-     */
-    public static function renameIfDefault(int $id, string $oldName, string $newName): bool
-    {
-        if (! DB::getSchemaBuilder()->hasTable(self::TABLE)) {
-            return false;
-        }
-        $row = DB::table(self::TABLE)->where('id', $id)->first(['name']);
-        $next = $row === null ? null : self::renamedJson((string) $row->name, $oldName, $newName);
-        if ($next === null) {
-            return false;
-        }
-
-        return DB::table(self::TABLE)->where('id', $id)->where('name', $row->name)
-            ->update(['name' => $next, 'updated_at' => now()]) === 1;
-    }
-
-    /**
-     * New name JSON when the stored names are exactly the old default (`{"ko": old}`), else null (pure).
-     */
-    public static function renamedJson(string $storedJson, string $oldName, string $newName): ?string
-    {
-        $names = json_decode($storedJson, true);
-        if (! is_array($names) || $names !== ['ko' => $oldName]) {
-            return null;
-        }
-
-        return json_encode(['ko' => $newName], JSON_UNESCAPED_UNICODE);
-    }
-
-    /**
      * Ids of categories that can be chosen (not deleted).
      *
      * @return array<int, int>
