@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "layout_name": "photos",
+  "extends": "_user_base",
+  "meta": {
+    "title": "$t:g7-diary-addon.photos_title",
+    "description": "g7-diary-addon: diary photo gallery screen. The content node is filled by the add-on's layout listener from resources/layout/photos/*.json (D49); search rendering is off (bots get the app shell).",
+    "seo": { "enabled": false }
+  },
+  "slots": {
+    "content": [
+      {
+        "id": "g7da_photos_root",
+        "type": "basic",
+        "name": "Div",
+        "props": { "className": "g7da-screen", "data-g7da": "photos" }
+      }
+    ]
+  }
+}

@@ -10,6 +10,7 @@ use Plugins\G7\Diary\Addon\Listeners\BoardTypeSeedListener;
 use Plugins\G7\Diary\Addon\Listeners\DiaryLayoutListener;
 use Plugins\G7\Diary\Addon\Listeners\DiaryListFilterListener;
 use Plugins\G7\Diary\Addon\Listeners\DiaryPurgeListener;
+use Plugins\G7\Diary\Addon\Listeners\DiaryRouteListener;
 use Plugins\G7\Diary\Addon\Listeners\DiarySaveListener;
 use Plugins\G7\Diary\Addon\Listeners\DiaryValidationListener;
 use Plugins\G7\Diary\Addon\Support\DiaryBoards;
@@ -57,6 +58,7 @@ class Plugin extends AbstractPlugin
      * - DiaryPurgeListener: removes diary rows of permanently deleted posts (sync).
      * - DiaryListFilterListener: `diary_category` list filter and its count-cache axis.
      * - DiaryLayoutListener: diary list branch, show info line and form fields (layout filter).
+     * - DiaryRouteListener: calendar / photo screen routes on user templates (route filter).
      *
      * @return array<int, class-string>
      */
@@ -69,6 +71,7 @@ class Plugin extends AbstractPlugin
             DiaryPurgeListener::class,
             DiaryListFilterListener::class,
             DiaryLayoutListener::class,
+            DiaryRouteListener::class,
         ];
     }
 
