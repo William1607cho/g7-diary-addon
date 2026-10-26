@@ -38,7 +38,7 @@
     {
       "type": "basic",
       "name": "Div",
-      "props": { "className": "g7da-heat-grid" },
+      "props": { "className": "g7da-heat-grid", "style": { "--g7da-cols": "{{(g7daHeat?.data?.columns ?? []).length || 53}}" } },
       "children": [
         {
           "type": "basic",

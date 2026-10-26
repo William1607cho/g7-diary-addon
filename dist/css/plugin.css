@@ -21,14 +21,11 @@
 .g7da-icon-btn:disabled { opacity: .5; cursor: not-allowed; }
 .g7da-search { margin-bottom: 1rem; }
 
-/* custom tooltip (no title attribute; aria-label carries the name) */
-[data-g7da-tip] { position: relative; }
-[data-g7da-tip]:hover::after, [data-g7da-tip]:focus-visible::after {
-  content: attr(data-g7da-tip); position: absolute; left: 50%; top: calc(100% + 6px); transform: translateX(-50%);
-  white-space: nowrap; padding: .25rem .5rem; border-radius: .375rem; background: #111827; color: #fff;
-  font-size: .75rem; line-height: 1rem; font-weight: 500; z-index: 60; pointer-events: none;
-}
-.dark [data-g7da-tip]:hover::after, .dark [data-g7da-tip]:focus-visible::after { background: #f3f4f6; color: #111827; }
+/* custom tooltip (D93): one layer fixed to the screen, placed by the plugin script from `data-g7da-tip` — above the
+   target, pushed inside at the screen edges, flipped below when there is no room; width capped, longer text wraps.
+   Nothing is drawn inside the target, so its box and its scroll area never change. No title attribute (aria-label). */
+.g7da-tip-layer { position: fixed; z-index: 80; max-width: min(18rem, calc(100vw - 16px)); padding: .25rem .5rem; border-radius: .375rem; background: #111827; color: #fff; font-size: .75rem; line-height: 1rem; font-weight: 500; white-space: normal; overflow-wrap: anywhere; pointer-events: none; }
+.dark .g7da-tip-layer { background: #f3f4f6; color: #111827; }
 
 /* cards */
 .g7da-cards { display: flex; flex-direction: column; gap: .75rem; }
@@ -48,12 +45,6 @@ button.g7da-card-link { display: flex; align-items: center; justify-content: fle
 .g7da-date { font-weight: 600; white-space: nowrap; }
 .g7da-title-wrap { flex: 1 1 auto; min-width: 0; }
 .g7da-title-text { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
-.g7da-title-wrap[data-g7da-tip]:hover::after { left: 0; transform: none; white-space: normal; width: max-content; max-width: 32rem; }
-/* D73: no card title / category emoji tooltips where nothing can hover (touch); the title tip is set by the
-   plugin script only while the title is actually cut. Icon button tooltips stay. */
-@media (hover: none) {
-  .g7da-card-link .g7da-cat[data-g7da-tip]::after, .g7da-card-link .g7da-title-wrap[data-g7da-tip]::after { display: none !important; }
-}
 .g7da-flags { display: inline-flex; align-items: center; gap: .5rem; margin-left: auto; font-size: .875rem; }
 .g7da-flags:empty { display: none; }
 .g7da-secret { display: inline-flex; align-items: center; color: var(--g7da-muted); }
@@ -110,8 +101,9 @@ button.g7da-card-link { display: flex; align-items: center; justify-content: fle
 /* side panel (wide only): tab fixed at the left edge, vertical centre; panel slides out left of the list */
 .g7da-tab { position: fixed; left: 0; top: 50%; transform: translateY(-50%); z-index: 40; display: none; align-items: center; justify-content: center; width: 1.5rem; height: 4.5rem; padding: 0; border: 1px solid var(--g7da-line); border-left: 0; border-radius: 0 9999px 9999px 0; background: var(--g7da-card); color: var(--g7da-muted); box-shadow: 0 2px 6px #0000001a; cursor: pointer; }
 .g7da-tab.is-open { color: var(--g7da-accent); }
-.g7da-tab[data-g7da-tip]:hover::after, .g7da-tab[data-g7da-tip]:focus-visible::after { left: calc(100% + 6px); top: 50%; transform: translateY(-50%); }
-.g7da-panel { position: fixed; left: 2rem; top: 50%; z-index: 39; width: 14rem; max-height: calc(100vh - 6rem); overflow-y: auto; display: none; flex-direction: column; gap: 1rem; padding: 1rem; background: var(--g7da-card); border: 1px solid var(--g7da-line); border-radius: .75rem; box-shadow: 0 8px 24px -6px #00000026; visibility: hidden; transform: translate(calc(-100% - 3rem), -50%); transition: transform .25s ease, visibility .25s; }
+/* D94: no horizontal scroll at all; vertical wheel scroll only when the screen is too low, scrollbar hidden */
+.g7da-panel::-webkit-scrollbar { display: none; }
+.g7da-panel { position: fixed; left: 2rem; top: 50%; z-index: 39; width: 14rem; max-height: calc(100vh - 6rem); overflow-x: hidden; overflow-y: auto; scrollbar-width: none; overscroll-behavior: contain; display: none; flex-direction: column; gap: 1rem; padding: 1rem; background: var(--g7da-card); border: 1px solid var(--g7da-line); border-radius: .75rem; box-shadow: 0 8px 24px -6px #00000026; visibility: hidden; transform: translate(calc(-100% - 3rem), -50%); transition: transform .25s ease, visibility .25s; }
 .g7da-panel.is-open { visibility: visible; transform: translate(0, -50%); }
 .g7da-streak { padding: .75rem; border-radius: .5rem; background: #fff7ed; text-align: center; }
 .dark .g7da-streak { background: #431407; }
@@ -165,7 +157,6 @@ button.g7da-card-link { display: flex; align-items: center; justify-content: fle
 .g7da-icons-sub { display: contents; }
 .g7da-mem-narrow, .g7da-cc-emo--narrow { display: none; }
 .g7da-ico-rewind { display: inline-block; width: 1.125em; height: 1.125em; background: currentColor; -webkit-mask: var(--g7da-rewind) center / contain no-repeat; mask: var(--g7da-rewind) center / contain no-repeat; --g7da-rewind: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 12a8.5 8.5 0 1 0 2.5-6'/%3E%3Cpath d='M3 3.5v4h4'/%3E%3Cpath d='M12 7.5V12l3 2'/%3E%3C/svg%3E"); }
-[data-g7da-tip=""]::after { display: none !important; }
 .g7da-nav-btn { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; padding: 0; border: 1px solid var(--g7da-line); border-radius: .375rem; background: var(--g7da-card); color: var(--g7da-muted); cursor: pointer; }
 .g7da-nav-btn:disabled { opacity: .4; cursor: default; }
 .g7da-cal-nav, .g7da-ppager { display: flex; align-items: center; gap: .5rem; }
@@ -175,14 +166,20 @@ button.g7da-card-link { display: flex; align-items: center; justify-content: fle
 .g7da-dow .is-sat, .g7da-cc.is-sat .g7da-cc-day, .g7da-pc.is-sat { color: #1d4ed8; }
 .dark .g7da-dow .is-sun, .dark .g7da-cc.is-sun .g7da-cc-day, .dark .g7da-pc.is-sun { color: #fca5a5; }
 .dark .g7da-dow .is-sat, .dark .g7da-cc.is-sat .g7da-cc-day, .dark .g7da-pc.is-sat { color: #93c5fd; }
-.g7da-heat, .g7da-cal, .g7da-day { margin-bottom: 1rem; padding: 1rem; background: var(--g7da-card); border: 1px solid var(--g7da-line); border-radius: .75rem; }
+/* D96: the screens sit in the list's frame (Container py-8); boxes are spaced by the body's gap, so no box adds
+   its own margin to the frame's bottom padding */
+.g7da-screen-body { display: flex; flex-direction: column; gap: 1rem; }
+.g7da-screen-body > .g7da-head, .g7da-screen-body .g7da-pfilter { margin-bottom: 0; }
+.g7da-screen-body > .g7da-pager { margin-top: .5rem; }
+.g7da-heat, .g7da-cal, .g7da-day { padding: 1rem; background: var(--g7da-card); border: 1px solid var(--g7da-line); border-radius: .75rem; }
 /* year heatmap (wide only): week columns of 7 days; colour = representative category; empty grey, future lighter, today ringed */
 .g7da-heat-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: .75rem; }
 .g7da-heat-total, .g7da-ppage { font-size: .875rem; font-weight: 600; color: var(--g7da-muted); }
-.g7da-heat-grid { display: flex; gap: 2px; overflow-x: auto; padding: 2px; }
-.g7da-heat-col { display: flex; flex-direction: column; gap: 2px; }
-.g7da-heat-mon { width: .875rem; height: 1rem; font-size: .625rem; line-height: 1rem; color: var(--g7da-muted); white-space: nowrap; overflow: visible; }
-button.g7da-hc { width: .875rem; height: .875rem; padding: 0; border: 0; border-radius: 3px; cursor: pointer; }
+/* D95: the week columns share the box width (cells grow / shrink with it, square), no scrollbar */
+.g7da-heat-grid { display: grid; grid-template-columns: repeat(var(--g7da-cols, 53), minmax(0, 1fr)); gap: 2px; padding: 3px; overflow: hidden; }
+.g7da-heat-col { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.g7da-heat-mon { height: 1rem; font-size: .625rem; line-height: 1rem; color: var(--g7da-muted); white-space: nowrap; overflow: visible; }
+button.g7da-hc { width: 100%; height: auto; aspect-ratio: 1 / 1; padding: 0; border: 0; border-radius: 3px; cursor: pointer; }
 .g7da-hc.is-empty, .g7da-swatch.is-empty { background: #e5e7eb; }
 .g7da-hc.is-empty.is-future { background: #f3f4f6; cursor: default; }
 .g7da-hc.is-locked, .g7da-swatch.is-locked { background: #64748b; }
@@ -193,7 +190,6 @@ button.g7da-hc { width: .875rem; height: .875rem; padding: 0; border: 0; border-
 .g7da-legend { display: flex; flex-wrap: wrap; gap: .5rem .875rem; margin-top: .75rem; font-size: .75rem; color: var(--g7da-muted); }
 .g7da-legend-item { display: inline-flex; align-items: center; gap: .25rem; }
 .g7da-swatch { display: inline-block; width: .75rem; height: .75rem; border-radius: 3px; }
-@media (hover: none) { .g7da-heat [data-g7da-tip]::after, .g7da-pcal [data-g7da-tip]::after { display: none !important; } }
 /* month calendar: light category colour, day number + every emoji (narrow: 2 + "+N"), today ringed, chosen day orange */
 .g7da-cal-nav--big { justify-content: center; margin-bottom: .5rem; }
 .g7da-cal-nav--big .g7da-cal-label { min-width: 8rem; font-size: 1.125rem; }
@@ -215,7 +211,8 @@ button.g7da-day-row:hover { background: #f9fafb; }
 .g7da-day-text { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .g7da-day-row.is-locked .g7da-day-text { color: var(--g7da-muted); }
 /* panel month calendar (wide only) */
-.g7da-pcal { display: flex; flex-direction: column; gap: .25rem; }
+/* D94: calendar → categories 32px (twice the old 16px panel gap), a faint line in the middle */
+.g7da-pcal { display: flex; flex-direction: column; gap: .25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--g7da-line); }
 .g7da-pcal .g7da-cal-nav { justify-content: space-between; }
 .g7da-pcal .g7da-cal-label { font-size: .875rem; }
 .g7da-pcal .g7da-nav-btn { width: 1.5rem; height: 1.5rem; font-size: .75rem; }
@@ -226,7 +223,7 @@ button.g7da-pc { aspect-ratio: 1 / 1; min-width: 0; padding: 0; border: 2px soli
 /* photo gallery: month groups, 5 columns (narrow 3), square thumbnails, emoji (top left) and date (bottom left) badges */
 .g7da-pfilter { display: flex; align-items: center; gap: .5rem; margin-bottom: 1rem; }
 .g7da-pfilter-chip { padding: .25rem .75rem; border: 2px solid var(--g7da-accent); border-radius: 9999px; font-weight: 600; color: var(--g7da-text); }
-.g7da-pgroup { margin-bottom: 1.5rem; }
+.g7da-pgroup + .g7da-pgroup { margin-top: 1.5rem; }
 .g7da-pgrid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .375rem; }
 button.g7da-pcell { position: relative; aspect-ratio: 1 / 1; min-width: 0; padding: 0; border: 0; border-radius: .5rem; overflow: hidden; background: #f3f4f6; cursor: pointer; }
 .dark button.g7da-pcell { background: #374151; }

@@ -169,7 +169,11 @@ class Bundle3Test extends TestCase
         $this->assertTrue(! isset($month['children'][2]['iteration']) && isset($month['children'][2]['children'][0]['iteration']));
         $pcal = $f->get('index/panel-month');
         $this->assertTrue(! isset($pcal['children'][2]['iteration']) && isset($pcal['children'][2]['children'][0]['iteration']));
-        // Lifecycle includes are resolved (screens load the summary on mount).
-        $this->assertSame('apiCall', $f->get('calendar/screen')['lifecycle']['onMount'][0]['handler']);
+        // Screens sit in the board list's frame (Container py-8) and lifecycle includes are resolved.
+        foreach (['calendar/screen', 'photos/screen'] as $name) {
+            $screen = $f->get($name);
+            $this->assertSame(['Container', 'py-8'], [$screen['name'], $screen['props']['className']], $name);
+            $this->assertSame('apiCall', $screen['children'][0]['lifecycle']['onMount'][0]['handler'], $name);
+        }
     }
 }

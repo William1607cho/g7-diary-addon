@@ -1,28 +1,35 @@
 {
-  "comment": "Photo gallery screen (/diary/:slug/photos): head row, the list's category filter (diary_category, with a clear chip), month groups ('2026년 10월 · 사진 12장') of square thumbnails — wide 5 columns, narrow 3 — with the category emoji (top left) and the diary date (bottom left); a cell opens the post. Secret posts the viewer cannot open are one lock cell without an address (D6 / D83). Display mode and page size from the settings (infinite / page turning).",
-  "type": "basic",
-  "name": "Div",
-  "props": { "className": "g7da-list g7da-screen-body", "data-g7da": "photos-screen" },
-  "lifecycle": {
-    "onMount": [ { "g7da_include": "common/summary-fetch" } ]
-  },
+  "comment": "Photo gallery screen (/diary/:slug/photos): head row, the list's category filter (diary_category, with a clear chip), month groups ('2026년 10월 · 사진 12장') of square thumbnails — wide 5 columns, narrow 3 — with the category emoji (top left) and the diary date (bottom left); a cell opens the post. Secret posts the viewer cannot open are one lock cell without an address (D6 / D83). Display mode and page size from the settings (infinite / page turning). Framed like the board list (template Container py-8 — D96).",
+  "type": "layout",
+  "name": "Container",
+  "props": { "className": "py-8" },
   "children": [
-    { "g7da_include": "index/header" },
-    { "g7da_include": "photos/filter" },
     {
       "type": "basic",
       "name": "Div",
-      "props": { "className": "g7da-pgroups" },
-      "children": [ { "g7da_include": "photos/group" } ]
-    },
-    {
-      "type": "basic",
-      "name": "Div",
-      "if": "{{g7daPhotos?.data && (g7daPhotos?.data?.total ?? 0) === 0}}",
-      "props": { "className": "g7da-empty", "data-testid": "g7da-photos-empty" },
-      "children": [ { "type": "basic", "name": "P", "text": "$t:g7-diary-addon.photos_empty" } ]
-    },
-    { "g7da_include": "photos/pager" },
-    { "g7da_include": "common/memories" }
+      "props": { "className": "g7da-list g7da-screen-body", "data-g7da": "photos-screen" },
+      "lifecycle": {
+        "onMount": [ { "g7da_include": "common/summary-fetch" } ]
+      },
+      "children": [
+        { "g7da_include": "index/header" },
+        { "g7da_include": "photos/filter" },
+        {
+          "type": "basic",
+          "name": "Div",
+          "props": { "className": "g7da-pgroups" },
+          "children": [ { "g7da_include": "photos/group" } ]
+        },
+        {
+          "type": "basic",
+          "name": "Div",
+          "if": "{{g7daPhotos?.data && (g7daPhotos?.data?.total ?? 0) === 0}}",
+          "props": { "className": "g7da-empty", "data-testid": "g7da-photos-empty" },
+          "children": [ { "type": "basic", "name": "P", "text": "$t:g7-diary-addon.photos_empty" } ]
+        },
+        { "g7da_include": "photos/pager" },
+        { "g7da_include": "common/memories" }
+      ]
+    }
   ]
 }

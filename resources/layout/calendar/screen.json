@@ -1,16 +1,23 @@
 {
-  "comment": "Calendar screen (/diary/:slug/calendar): head row, year heatmap (wide only), month calendar, the chosen day's posts, 지난 오늘 popup. Year / month / date live in the address (year, month, date); moving inside the screen replaces the address, keeps the scroll and refetches only the sources it changes.",
-  "type": "basic",
-  "name": "Div",
-  "props": { "className": "g7da-list g7da-screen-body", "data-g7da": "calendar-screen" },
-  "lifecycle": {
-    "onMount": [ { "g7da_include": "common/summary-fetch" } ]
-  },
+  "comment": "Calendar screen (/diary/:slug/calendar): head row, year heatmap (wide only), month calendar, the chosen day's posts, 지난 오늘 popup. Year / month / date live in the address (year, month, date); moving inside the screen replaces the address, keeps the scroll and refetches only the sources it changes. Framed like the board list (template Container py-8 — D96), boxes spaced by the body's gap.",
+  "type": "layout",
+  "name": "Container",
+  "props": { "className": "py-8" },
   "children": [
-    { "g7da_include": "index/header" },
-    { "g7da_include": "calendar/heatmap" },
-    { "g7da_include": "calendar/month" },
-    { "g7da_include": "calendar/day" },
-    { "g7da_include": "common/memories" }
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-list g7da-screen-body", "data-g7da": "calendar-screen" },
+      "lifecycle": {
+        "onMount": [ { "g7da_include": "common/summary-fetch" } ]
+      },
+      "children": [
+        { "g7da_include": "index/header" },
+        { "g7da_include": "calendar/heatmap" },
+        { "g7da_include": "calendar/month" },
+        { "g7da_include": "calendar/day" },
+        { "g7da_include": "common/memories" }
+      ]
+    }
   ]
 }

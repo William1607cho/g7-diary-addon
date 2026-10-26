@@ -10,6 +10,7 @@
  *    the post just shown is kept in session storage per board and left out of the next pick (works without it).
  * 5. 지난 오늘 popup (wide): focus moves into the dialog and stays there (Tab), Esc closes it, and focus goes
  *    back to the icon that opened it.
+ * 6. Tooltips: a single screen-fixed layer for every `data-g7da-tip` (D93).
  * The infinite-scroll helper also serves the photo gallery (same attribute). Does nothing on pages without
  * diary nodes.
  */
@@ -65,6 +66,66 @@
         wrap.removeAttribute('data-g7da-tip');
       }
     });
+  }
+
+  // 6. Tooltips (D93): one layer fixed to the screen, filled from `data-g7da-tip` of the hovered (or keyboard-focused)
+  // element — above it, pushed inside at the screen edges, below when there is no room above. Nothing is drawn inside
+  // the target. Where nothing can hover, card / heatmap / panel calendar tips stay off (D73); icon buttons keep theirs.
+  var NO_TOUCH_TIP = '.g7da-card-link [data-g7da-tip], .g7da-heat [data-g7da-tip], .g7da-pcal [data-g7da-tip]';
+  var EDGE = 8;
+  var GAP = 6;
+  var tip = { el: null, target: null };
+  function tipTarget(node) {
+    var t = node && node.closest ? node.closest('[data-g7da-tip]') : null;
+    return t && t.getAttribute('data-g7da-tip') ? t : null;
+  }
+  function hideTip() {
+    if (tip.el) {
+      tip.el.style.display = 'none';
+    }
+    tip.target = null;
+  }
+  function showTip(t) {
+    if (!canHover && t.matches(NO_TOUCH_TIP)) {
+      return;
+    }
+    if (!tip.el) {
+      tip.el = document.createElement('div');
+      tip.el.className = 'g7da-tip-layer';
+      tip.el.setAttribute('role', 'tooltip');
+      tip.el.setAttribute('data-g7da-tip-layer', '');
+      document.body.appendChild(tip.el);
+    }
+    tip.target = t;
+    tip.el.textContent = t.getAttribute('data-g7da-tip');
+    tip.el.style.display = 'block';
+    tip.el.style.left = '0px';
+    tip.el.style.top = '0px';
+    var r = t.getBoundingClientRect();
+    var w = tip.el.offsetWidth;
+    var h = tip.el.offsetHeight;
+    var left = Math.min(Math.max(EDGE, r.left + r.width / 2 - w / 2), window.innerWidth - EDGE - w);
+    var top = r.top - GAP - h;
+    if (top < EDGE) {
+      top = r.bottom + GAP;
+    }
+    tip.el.style.left = Math.round(left) + 'px';
+    tip.el.style.top = Math.round(top) + 'px';
+  }
+  function onOver(e) {
+    var t = tipTarget(e.target);
+    if (t === tip.target) {
+      return;
+    }
+    hideTip();
+    if (t && (e.type === 'mouseover' || (t.matches && t.matches(':focus-visible')))) {
+      showTip(t);
+    }
+  }
+  function onOut(e) {
+    if (tip.target && !(e.relatedTarget && tip.target.contains(e.relatedTarget))) {
+      hideTip();
+    }
   }
 
   // 4. narrow 지난 오늘: one pick, straight to the post; the last shown id is excluded next time.
@@ -164,6 +225,9 @@
     window.requestAnimationFrame(function () {
       pending = false;
       watchPopup();
+      if (tip.target && (!tip.target.isConnected || !tip.target.getAttribute('data-g7da-tip'))) {
+        hideTip();
+      }
       if (!document.querySelector('[data-g7da]')) {
         return;
       }
@@ -178,6 +242,12 @@
     new MutationObserver(refresh).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-g7da-more', 'disabled'] });
     window.addEventListener('resize', refresh);
     document.addEventListener('keydown', onKey);
+    document.addEventListener('mouseover', onOver);
+    document.addEventListener('focusin', onOver);
+    document.addEventListener('mouseout', onOut);
+    document.addEventListener('focusout', onOut);
+    window.addEventListener('scroll', hideTip, true);
+    window.addEventListener('resize', hideTip);
     document.addEventListener('click', function (e) {
       var btn = e.target && e.target.closest ? e.target.closest('[data-g7da-memory-go]') : null;
       if (btn) {
