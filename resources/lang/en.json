@@ -4,6 +4,7 @@
   "panel_open": "Open diary panel",
   "panel_close": "Close diary panel",
   "categories": "Categories",
+  "all": "All",
   "category_filter": "Filter by category",
   "streak_current": "Day {{count}} in a row",
   "streak_longest": "Longest streak: {{count}} days",

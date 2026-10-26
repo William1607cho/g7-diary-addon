@@ -12,18 +12,16 @@ namespace Plugins\G7\Diary\Addon\Support;
  *   (iframe, oembed, video, audio — and a figure holding one) become one plain link line.
  * - Links stay plain `<a href>`; the preview box never gets `.ck-content`, so the
  *   superpack does not turn them into link cards.
- * - Images keep only safe attributes; the caller maps the address (240 variant or the
- *   original) through `$imageUrl`.
+ * - Images are left out — the card shows them in its photo row ({@see PhotoStrip}, D64).
  */
 final class PreviewHtml
 {
     private const ROOT_ID = 'g7da-preview-root';
 
     /**
-     * @param  callable(string): string|null  $imageUrl  Display address for an image address.
      * @return array{html: string, clipped: bool}
      */
-    public static function build(string $content, ?string $contentMode, ?callable $imageUrl = null, ?PreviewBudget $budget = null): array
+    public static function build(string $content, ?string $contentMode, ?PreviewBudget $budget = null): array
     {
         $budget ??= new PreviewBudget;
         if (trim($content) === '') {
@@ -31,7 +29,7 @@ final class PreviewHtml
         }
 
         $html = ($contentMode ?? 'text') === 'html'
-            ? self::fromHtml($content, $budget, $imageUrl)
+            ? self::fromHtml($content, $budget)
             : self::fromText($content, $budget);
 
         return ['html' => $html, 'clipped' => $budget->clipped];
@@ -56,7 +54,7 @@ final class PreviewHtml
         return $out;
     }
 
-    private static function fromHtml(string $content, PreviewBudget $budget, ?callable $imageUrl): string
+    private static function fromHtml(string $content, PreviewBudget $budget): string
     {
         $source = self::parse($content);
         if ($source === null) {
@@ -65,7 +63,7 @@ final class PreviewHtml
 
         $doc = new \DOMDocument('1.0', 'UTF-8');
         $root = $doc->appendChild($doc->createElement('div'));
-        (new PreviewCopier($doc, $budget, $imageUrl))->copyChildren($source, $root, true);
+        (new PreviewCopier($doc, $budget))->copyChildren($source, $root, true);
 
         $out = '';
         foreach ($root->childNodes as $child) {

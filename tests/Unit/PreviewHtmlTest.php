@@ -12,9 +12,9 @@ use Plugins\G7\Diary\Addon\Support\PreviewPolicy;
  */
 class PreviewHtmlTest extends TestCase
 {
-    private function html(string $content, ?callable $img = null, ?PreviewBudget $budget = null): string
+    private function html(string $content, ?PreviewBudget $budget = null): string
     {
-        return PreviewHtml::build($content, 'html', $img, $budget)['html'];
+        return PreviewHtml::build($content, 'html', $budget)['html'];
     }
 
     public function test_keeps_basic_formatting(): void
@@ -66,8 +66,8 @@ class PreviewHtmlTest extends TestCase
 
     public function test_cut_inside_an_element_closes_the_tags(): void
     {
-        $budget = new PreviewBudget(6, 10, 1);
-        $result = PreviewHtml::build('<p>가나다 <strong>라마바사아자차</strong>카타</p><p>다음</p>', 'html', null, $budget);
+        $budget = new PreviewBudget(6, 10);
+        $result = PreviewHtml::build('<p>가나다 <strong>라마바사아자차</strong>카타</p><p>다음</p>', 'html', $budget);
 
         $this->assertSame('<p>가나다 <strong>라마바사아자…</strong></p>', $result['html']);
         $this->assertTrue($result['clipped']);
@@ -89,14 +89,14 @@ class PreviewHtmlTest extends TestCase
         $this->assertFalse($result['clipped']);
     }
 
-    public function test_images_keep_safe_attributes_and_go_through_the_mapper(): void
+    public function test_images_are_left_out_of_the_preview(): void
     {
-        $map = static fn (string $src): string => $src === '/api/plugins/sirsoft-ckeditor5/images/aaaaaaaaaaaa' ? '/v/aaa-240.webp' : $src;
-        $out = $this->html('<p><img src="/api/plugins/sirsoft-ckeditor5/images/aaaaaaaaaaaa" alt="고양이" width="800" height="x" onerror="alert(1)" class="z"></p><p><img src="https://cdn.example/b.png"></p>', $map);
+        // D64: images go to the card's photo row; a figure keeps only its caption text.
+        $out = $this->html('<p>앞 <img src="/api/plugins/sirsoft-ckeditor5/images/aaaaaaaaaaaa" alt="고양이"> 뒤</p><figure class="image"><img src="/x.png"><figcaption>설명</figcaption></figure><figure class="image"><img src="/y.png"></figure><p>끝</p>');
 
-        $this->assertStringContainsString('<img src="/v/aaa-240.webp" alt="고양이" loading="lazy" width="800">', $out);
-        $this->assertStringNotContainsString('onerror', $out);
-        $this->assertStringNotContainsString('cdn.example', $out); // second image over the 1-image limit
+        $this->assertSame('<p>앞  뒤</p>설명<p>끝</p>', $out);
+        $this->assertStringNotContainsString('<img', $out);
+        $this->assertStringNotContainsString('<figure', $out);
     }
 
     public function test_unsafe_image_addresses_are_dropped(): void

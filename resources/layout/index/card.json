@@ -1,5 +1,5 @@
 {
-  "comment": "One diary card. The title button is stretched over the whole card (CSS), so a click anywhere opens the post; links inside the preview stay plain <a> but do not take clicks in the list. No created time — only the diary date.",
+  "comment": "One diary card (D65). The head line is the card link: category emoji, diary date, weather emoji, title (bold, one line, …), and at the right end the secret lock / pinned bullhorn. Wide screens: one line at 1.5x; narrow: emoji·date·weather·flags, then the title on its own line (CSS order). The link is stretched over the card (CSS ::after), so a click anywhere opens the post; the head items sit above that layer only for their tooltips. Then the text preview and the photo row (D64). No created time — only the diary date.",
   "type": "basic",
   "name": "Div",
   "props": {
@@ -9,18 +9,27 @@
   "children": [
     {
       "type": "basic",
-      "name": "Div",
-      "props": { "className": "g7da-card-head" },
+      "name": "Button",
+      "props": { "type": "button", "className": "g7da-card-link" },
+      "actions": [
+        {
+          "type": "click",
+          "handler": "navigate",
+          "params": { "path": "/board/{{route?.slug}}/{{post?.id}}", "mergeQuery": true, "query": {} }
+        }
+      ],
       "children": [
         {
           "type": "basic",
           "name": "Span",
           "if": "{{post?.diary?.category}}",
           "props": {
-            "className": "g7da-chip",
-            "style": { "backgroundColor": "{{(post?.diary?.category?.color ?? '#9CA3AF') + '26'}}" }
+            "className": "g7da-cat",
+            "role": "img",
+            "aria-label": "{{post?.diary?.category?.name ?? ''}}",
+            "data-g7da-tip": "{{post?.diary?.category?.name ?? ''}}"
           },
-          "text": "{{post?.diary?.category?.emoji ?? ''}} {{post?.diary?.category?.name ?? ''}}"
+          "text": "{{post?.diary?.category?.emoji ?? ''}}"
         },
         {
           "type": "basic",
@@ -44,41 +53,13 @@
         {
           "type": "basic",
           "name": "Span",
-          "if": "{{post?.is_secret}}",
-          "props": { "className": "g7da-secret" },
+          "props": { "className": "g7da-title-wrap", "data-g7da-tip": "{{post?.title ?? ''}}" },
           "children": [
-            { "type": "basic", "name": "Icon", "props": { "name": "lock", "size": "sm", "aria-hidden": "true" } },
-            { "type": "basic", "name": "Span", "text": "$t:g7-diary-addon.secret" }
+            { "type": "basic", "name": "Span", "props": { "className": "g7da-title-text" }, "text": "{{post?.title ?? ''}}" }
           ]
         },
-        {
-          "type": "basic",
-          "name": "Span",
-          "if": "{{post?.deleted_at}}",
-          "props": { "className": "g7da-deleted" },
-          "text": "$t:g7-diary-addon.deleted"
-        },
-        {
-          "type": "basic",
-          "name": "Span",
-          "if": "{{post?.row_type === 'notice'}}",
-          "props": { "className": "g7da-pin" },
-          "text": "$t:g7-diary-addon.pinned"
-        }
+        { "g7da_include": "index/card-flags" }
       ]
-    },
-    {
-      "type": "basic",
-      "name": "Button",
-      "props": { "type": "button", "className": "g7da-card-title" },
-      "actions": [
-        {
-          "type": "click",
-          "handler": "navigate",
-          "params": { "path": "/board/{{route?.slug}}/{{post?.id}}", "mergeQuery": true, "query": {} }
-        }
-      ],
-      "text": "{{post?.title ?? ''}}"
     },
     {
       "type": "basic",
@@ -97,6 +78,7 @@
         }
       ]
     },
+    { "g7da_include": "index/card-photos" },
     {
       "type": "basic",
       "name": "Div",

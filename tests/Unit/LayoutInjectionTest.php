@@ -184,8 +184,18 @@ class LayoutInjectionTest extends TestCase
         foreach (['index/mobile-categories', 'index/panel-categories', 'form/weather'] as $name) {
             $node = $f->get($name);
             $this->assertFalse(isset($node['iteration']), $name);
-            $this->assertTrue(isset($node['children'][0]['iteration']), $name);
+            $iterated = array_values(array_filter($node['children'], static fn (array $c): bool => isset($c['iteration'])));
+            $this->assertCount(1, $iterated, $name);
         }
+        // D67: 'All' comes first and is not repeated.
+        foreach (['index/mobile-categories', 'index/panel-categories'] as $name) {
+            $first = $f->get($name)['children'][0];
+            $this->assertFalse(isset($first['iteration']), $name);
+            $this->assertStringContainsString('--all', $first['props']['className'], $name);
+        }
+        $photos = $f->get('index/card-photos');
+        $this->assertFalse(isset($photos['iteration']));
+        $this->assertTrue(isset($photos['children'][0]['iteration']));
         $cats = $f->get('form/categories');
         $this->assertFalse(isset($cats['children'][0]['iteration']));
         $this->assertTrue(isset($cats['children'][0]['children'][0]['iteration']));

@@ -7,13 +7,9 @@ namespace Plugins\G7\Diary\Addon\Support;
  */
 final class PreviewCopier
 {
-    /**
-     * @param  callable(string): string|null  $imageUrl
-     */
     public function __construct(
         private readonly \DOMDocument $doc,
         private readonly PreviewBudget $budget,
-        private $imageUrl = null,
     ) {}
 
     public function copyChildren(\DOMNode $from, \DOMNode $to, bool $topLevel): void
@@ -52,12 +48,6 @@ final class PreviewCopier
         $embed = $this->embedSource($el, $tag);
         if ($embed !== false) {
             $this->appendEmbedLink($embed, $to, $topLevel);
-
-            return;
-        }
-
-        if ($tag === 'img') {
-            $this->appendImage($el, $to, $topLevel);
 
             return;
         }
@@ -137,32 +127,6 @@ final class PreviewCopier
 
         $holder = $topLevel ? $to->appendChild($this->doc->createElement('p')) : $to;
         $holder->appendChild($link);
-    }
-
-    private function appendImage(\DOMElement $el, \DOMNode $to, bool $topLevel): void
-    {
-        $src = PreviewPolicy::safeUrl($el->getAttribute('src'), false);
-        if ($src === null || ! $this->budget->takeImage()) {
-            return;
-        }
-        if ($topLevel && ! $this->budget->openBlock()) {
-            return;
-        }
-        if (is_callable($this->imageUrl)) {
-            $src = (string) ($this->imageUrl)($src);
-        }
-
-        $img = $this->doc->createElement('img');
-        $img->setAttribute('src', $src);
-        $img->setAttribute('alt', mb_substr(trim($el->getAttribute('alt')), 0, 200));
-        $img->setAttribute('loading', 'lazy');
-        foreach (['width', 'height'] as $dim) {
-            $value = PreviewPolicy::safeDimension($el->getAttribute($dim));
-            if ($value !== null) {
-                $img->setAttribute($dim, $value);
-            }
-        }
-        $to->appendChild($img);
     }
 
     private function safeHref(\DOMElement $el): ?string

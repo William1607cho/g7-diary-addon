@@ -16,6 +16,8 @@ class DiaryPostReader
 {
     public const ENTRIES = 'g7_diary_addon_entries';
 
+    public const PHOTOS = 'g7_diary_addon_photos';
+
     /** Body characters read for a preview (enough markup for 320 visible characters). */
     public const PREVIEW_SOURCE_LIMIT = 6000;
 
@@ -67,6 +69,29 @@ class DiaryPostReader
         $out = [];
         foreach (DB::table(self::ENTRIES)->whereIn('post_id', $ids)->get(['post_id', 'category_id', 'weather', 'diary_date']) as $row) {
             $out[(int) $row->post_id] = (array) $row;
+        }
+
+        return $out;
+    }
+
+    /**
+     * Editor image hashes of each post in body order, from the photo index (one query).
+     * Attachments are not included (D14 / bundle 2 instruction 2-7).
+     *
+     * @param  array<int, int>  $ids
+     * @return array<int, array<int, string>> post id => hashes
+     */
+    public function editorPhotos(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        $out = [];
+        $rows = DB::table(self::PHOTOS)->whereIn('post_id', $ids)->where('source', 'editor')
+            ->orderBy('post_id')->orderBy('position')->get(['post_id', 'ref']);
+        foreach ($rows as $row) {
+            $out[(int) $row->post_id][] = (string) $row->ref;
         }
 
         return $out;

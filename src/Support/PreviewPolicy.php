@@ -15,15 +15,19 @@ final class PreviewPolicy
     /** Tags copied as they are (attributes per {@see self::ATTRIBUTES}). */
     public const KEEP = [
         'p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'del', 'ins', 'mark', 'sub', 'sup',
-        'a', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'hr', 'img',
-        'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'figure', 'figcaption',
+        'a', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'hr',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
     ];
 
-    /** Tags removed together with everything inside them. */
+    /**
+     * Tags removed together with everything inside them. Images are removed too — the card
+     * shows them in its photo row instead (D64); a figure around an image is unwrapped and
+     * keeps only its caption text.
+     */
     public const DROP = [
         'script', 'style', 'noscript', 'template', 'object', 'embed', 'param', 'applet',
         'form', 'input', 'button', 'select', 'textarea', 'option', 'svg', 'math', 'canvas',
-        'head', 'title', 'meta', 'link', 'base', 'frame', 'frameset',
+        'head', 'title', 'meta', 'link', 'base', 'frame', 'frameset', 'img', 'picture',
     ];
 
     /** Embeds replaced by one plain link line to their address. */
@@ -31,21 +35,20 @@ final class PreviewPolicy
 
     /** Block-level tags — each one counts as a block of the preview. */
     public const BLOCKS = [
-        'p', 'ul', 'ol', 'blockquote', 'pre', 'hr', 'figure', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'p', 'ul', 'ol', 'blockquote', 'pre', 'hr', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
         'div', 'section', 'article', 'table',
     ];
 
     /** @var array<string, array<int, string>> */
     public const ATTRIBUTES = [
         'a' => ['href'],
-        'img' => ['src', 'alt', 'width', 'height'],
     ];
 
     /** Attribute names that may carry an embed address, in order of preference. */
     public const EMBED_SOURCES = ['url', 'src', 'data-oembed-url'];
 
     /**
-     * A link or image address that may stay in the preview, or null.
+     * A link or embed address that may stay in the preview, or null.
      *
      * Allowed: `http://`, `https://`, site-relative `/…` (not `//…`), and for links `#…` and
      * `mailto:`. Addresses with control characters or whitespace are rejected.
@@ -67,14 +70,6 @@ final class PreviewPolicy
         }
 
         return null;
-    }
-
-    /**
-     * Width / height attribute value (1–4 digits) or null.
-     */
-    public static function safeDimension(string $value): ?string
-    {
-        return preg_match('/^\d{1,4}$/', trim($value)) === 1 ? trim($value) : null;
     }
 
     public static function isKept(string $tag): bool

@@ -1,5 +1,5 @@
 {
-  "comment": "Category buttons: square boxes, 3 per row — big emoji, name below, post count badge (D6: secret posts the viewer cannot open are not counted). Selected = orange border; pressing it again clears the filter.",
+  "comment": "Category buttons, 3 per row (3·3·2): first 'All' (📖, badge = all posts — existence counts, D6), then the categories (badge = posts the viewer may see the category of, D6). Fixed equal squares; name area always two lines (keep-all). Selected = orange border; 'All' is selected without a filter. Pressing a selected category keeps it — only 'All' clears the filter (D67).",
   "type": "basic",
   "name": "Div",
   "props": {
@@ -8,6 +8,28 @@
     "aria-label": "$t:g7-diary-addon.category_filter"
   },
   "children": [
+    {
+      "type": "basic",
+      "name": "Button",
+      "props": {
+        "type": "button",
+        "className": "{{'g7da-pcat g7da-pcat--all' + (!query.diary_category ? ' is-on' : '')}}",
+        "aria-pressed": "{{!query.diary_category ? 'true' : 'false'}}",
+        "aria-label": "{{$t('g7-diary-addon.all') + ' ' + (_local.g7daSummary?.total ?? 0)}}"
+      },
+      "actions": [
+        {
+          "type": "click",
+          "handler": "navigate",
+          "params": { "path": "/board/{{route.slug}}", "mergeQuery": true, "query": { "diary_category": "", "page": 1 } }
+        }
+      ],
+      "children": [
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-pcat-emoji", "aria-hidden": "true" }, "text": "📖" },
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-pcat-name", "aria-hidden": "true" }, "text": "$t:g7-diary-addon.all" },
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-pcat-count", "aria-hidden": "true" }, "text": "{{_local.g7daSummary?.total ?? 0}}" }
+      ]
+    },
     {
       "type": "basic",
       "name": "Button",
@@ -23,11 +45,7 @@
         {
           "type": "click",
           "handler": "navigate",
-          "params": {
-            "path": "/board/{{route.slug}}",
-            "mergeQuery": true,
-            "query": { "diary_category": "{{query.diary_category == cat.id ? '' : cat.id}}", "page": 1 }
-          }
+          "params": { "path": "/board/{{route.slug}}", "mergeQuery": true, "query": { "diary_category": "{{cat.id}}", "page": 1 } }
         }
       ],
       "children": [

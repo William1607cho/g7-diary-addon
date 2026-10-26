@@ -20,7 +20,7 @@ class DiaryCategories
     public const DEFAULTS = [
         ['id' => 1, 'icon' => '😊', 'name' => '행복일기', 'color' => '#EAB308', 'default' => false],
         ['id' => 2, 'icon' => '😢', 'name' => '우울일기', 'color' => '#3B82F6', 'default' => false],
-        ['id' => 3, 'icon' => '😡', 'name' => '개빡치는 날', 'color' => '#EF4444', 'default' => false],
+        ['id' => 3, 'icon' => '😡', 'name' => '분노일기', 'color' => '#EF4444', 'default' => false],
         ['id' => 4, 'icon' => '😌', 'name' => '평온한 하루', 'color' => '#22C55E', 'default' => true],
         ['id' => 5, 'icon' => '🎉', 'name' => '스페샬 이벤트', 'color' => '#A855F7', 'default' => false],
         ['id' => 6, 'icon' => '🍜', 'name' => '맛집탐방', 'color' => '#F97316', 'default' => false],
@@ -56,6 +56,40 @@ class DiaryCategories
         }
 
         return DB::table(self::TABLE)->insertOrIgnore($rows);
+    }
+
+    /**
+     * Renames a default category only while its stored name is still the old default (D63).
+     * A name the site changed is left alone. One conditional UPDATE on the row id.
+     *
+     * @return bool Renamed.
+     */
+    public static function renameIfDefault(int $id, string $oldName, string $newName): bool
+    {
+        if (! DB::getSchemaBuilder()->hasTable(self::TABLE)) {
+            return false;
+        }
+        $row = DB::table(self::TABLE)->where('id', $id)->first(['name']);
+        $next = $row === null ? null : self::renamedJson((string) $row->name, $oldName, $newName);
+        if ($next === null) {
+            return false;
+        }
+
+        return DB::table(self::TABLE)->where('id', $id)->where('name', $row->name)
+            ->update(['name' => $next, 'updated_at' => now()]) === 1;
+    }
+
+    /**
+     * New name JSON when the stored names are exactly the old default (`{"ko": old}`), else null (pure).
+     */
+    public static function renamedJson(string $storedJson, string $oldName, string $newName): ?string
+    {
+        $names = json_decode($storedJson, true);
+        if (! is_array($names) || $names !== ['ko' => $oldName]) {
+            return null;
+        }
+
+        return json_encode(['ko' => $newName], JSON_UNESCAPED_UNICODE);
     }
 
     /**

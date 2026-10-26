@@ -1,0 +1,32 @@
+{
+  "comment": "Photo row (D64): editor images of the body, in body order, square thumbnails (240 variant, else original). Up to 4 cells on wide screens, 3 on narrow (CSS); the last shown cell gets a '+N' cover when there are more. Not drawn without photos; locked secret posts and blinded posts carry none (server). Clicks pass through to the card link.",
+  "type": "basic",
+  "name": "Div",
+  "if": "{{(post?.diary_photos ?? []).length > 0}}",
+  "props": { "className": "g7da-photos", "data-g7da-photos": "{{post?.diary_photo_count ?? 0}}" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Div",
+      "iteration": { "source": "{{post?.diary_photos ?? []}}", "item_var": "ph" },
+      "props": { "className": "g7da-ph" },
+      "children": [
+        { "type": "basic", "name": "Img", "props": { "src": "{{ph.src}}", "alt": "", "loading": "lazy", "decoding": "async" } },
+        {
+          "type": "basic",
+          "name": "Span",
+          "if": "{{ph.more_wide > 0}}",
+          "props": { "className": "g7da-ph-more g7da-ph-more--wide" },
+          "text": "+{{ph.more_wide}}"
+        },
+        {
+          "type": "basic",
+          "name": "Span",
+          "if": "{{ph.more_narrow > 0}}",
+          "props": { "className": "g7da-ph-more g7da-ph-more--narrow" },
+          "text": "+{{ph.more_narrow}}"
+        }
+      ]
+    }
+  ]
+}

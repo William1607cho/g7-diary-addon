@@ -1,0 +1,43 @@
+{
+  "comment": "Right end of the card head line: secret lock, pinned bullhorn (red, D66), deleted badge (manager 'show deleted'). Icons only, custom tooltip + aria-label.",
+  "type": "basic",
+  "name": "Span",
+  "props": { "className": "g7da-flags" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Span",
+      "if": "{{post?.is_secret}}",
+      "props": {
+        "className": "g7da-secret",
+        "role": "img",
+        "aria-label": "$t:g7-diary-addon.secret",
+        "data-g7da-tip": "$t:g7-diary-addon.secret"
+      },
+      "children": [
+        { "type": "basic", "name": "Icon", "props": { "name": "lock", "size": "sm", "aria-hidden": "true" } }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Span",
+      "if": "{{post?.row_type === 'notice'}}",
+      "props": {
+        "className": "g7da-pin",
+        "role": "img",
+        "aria-label": "$t:g7-diary-addon.pinned",
+        "data-g7da-tip": "$t:g7-diary-addon.pinned"
+      },
+      "children": [
+        { "type": "basic", "name": "Icon", "props": { "name": "bullhorn", "size": "sm", "aria-hidden": "true" } }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Span",
+      "if": "{{post?.deleted_at}}",
+      "props": { "className": "g7da-deleted" },
+      "text": "$t:g7-diary-addon.deleted"
+    }
+  ]
+}

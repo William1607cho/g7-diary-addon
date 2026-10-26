@@ -3,11 +3,11 @@
 namespace Plugins\G7\Diary\Addon\Support;
 
 /**
- * Running limits while one preview is being built (blocks, characters, images).
+ * Running limits while one preview is being built (blocks, characters).
  *
- * Defaults (D37): 6 top-level blocks, 320 characters, 1 image — about six lines of the
- * card at the list width. The card clips the rest with a fade (CSS), so the server only
- * has to stop early enough that a page of cards stays small.
+ * Defaults (D37): 6 top-level blocks, 320 characters — about six lines of the card at the
+ * list width. The card clips the rest with a fade (CSS), so the server only has to stop
+ * early enough that a page of cards stays small. Images are not part of the preview (D64).
  */
 final class PreviewBudget
 {
@@ -15,15 +15,11 @@ final class PreviewBudget
 
     public const MAX_CHARS = 320;
 
-    public const MAX_IMAGES = 1;
-
     public const ELLIPSIS = '…';
 
     public int $blocks = 0;
 
     public int $chars = 0;
-
-    public int $images = 0;
 
     /** Something was left out. */
     public bool $clipped = false;
@@ -34,7 +30,6 @@ final class PreviewBudget
     public function __construct(
         private readonly int $maxBlocks = self::MAX_BLOCKS,
         private readonly int $maxChars = self::MAX_CHARS,
-        private readonly int $maxImages = self::MAX_IMAGES,
     ) {}
 
     /**
@@ -82,23 +77,5 @@ final class PreviewBudget
         $this->stopped = true;
 
         return rtrim(Graphemes::substr($text, max(0, $left))).self::ELLIPSIS;
-    }
-
-    /**
-     * One more image allowed? Images over the limit are skipped (clipped), not stopping.
-     */
-    public function takeImage(): bool
-    {
-        if ($this->stopped) {
-            return false;
-        }
-        if ($this->images >= $this->maxImages) {
-            $this->clipped = true;
-
-            return false;
-        }
-        $this->images++;
-
-        return true;
     }
 }

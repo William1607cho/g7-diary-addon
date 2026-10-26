@@ -4,17 +4,20 @@ namespace Plugins\G7\Diary\Addon\Services;
 
 use Plugins\G7\Diary\Addon\Support\DiaryCatalog;
 use Plugins\G7\Diary\Addon\Support\ImageVariants;
+use Plugins\G7\Diary\Addon\Support\PhotoStrip;
 use Plugins\G7\Diary\Addon\Support\PreviewEligibility;
 use Plugins\G7\Diary\Addon\Support\PreviewHtml;
 use Plugins\G7\Diary\Addon\Support\SecretVisibility;
 
 /**
- * Adds diary meta and the preview HTML to the items of a diary board list (D8 / D9).
+ * Adds diary meta, the preview HTML and the photo row to the items of a diary board list (D8 / D9 / D64).
  *
- * Per item: `diary` (see DiaryMeta), `diary_preview_html`, `diary_preview_clipped`.
- * Secret posts the viewer cannot open get `diary.locked = true`, no category / weather
- * and no preview. Soft-deleted posts (manager "show deleted") get nothing.
- * Queries per page: posts 1, entries 1, image variants 0–1, plus the secret checks.
+ * Per item: `diary` (see DiaryMeta), `diary_preview_html` (text only — images go to the
+ * photo row), `diary_preview_clipped`, `diary_photos` (cells, see PhotoStrip) and
+ * `diary_photo_count`. Secret posts the viewer cannot open get `diary.locked = true`, no
+ * category / weather, no preview and no photos; blinded posts get no preview and no photos.
+ * Soft-deleted posts (manager "show deleted") get nothing.
+ * Queries per page: posts 1, entries 1, photo index 1, image variants 0–1, plus the secret checks.
  */
 class ListEnricher
 {
@@ -37,18 +40,18 @@ class ListEnricher
             return $data;
         }
 
-        $ids = [];
-        foreach ($items as $item) {
-            if (is_array($item) && isset($item['id'])) {
-                $ids[] = (int) $item['id'];
-            }
-        }
-
-        $rows = $this->reader->listRows($ids);
+        $rows = $this->reader->listRows($this->ids($items));
         $live = array_filter($rows, static fn (object $r): bool => $r->deleted_at === null);
         $visible = $this->visibility->visibleMap($slug, $live);
         $entries = $this->reader->entries(array_keys($live));
-        $previews = $this->previews($live, $visible);
+        $shown = [];
+        foreach ($items as $item) {
+            $id = is_array($item) ? (int) ($item['id'] ?? 0) : 0;
+            if (isset($live[$id]) && PreviewEligibility::allows($item, ! ($visible[$id] ?? false))) {
+                $shown[$id] = true;
+            }
+        }
+        $photos = $this->photoCells(array_intersect_key($live, $shown));
 
         foreach ($items as $i => $item) {
             $row = is_array($item) && isset($item['id']) ? ($live[(int) $item['id']] ?? null) : null;
@@ -56,16 +59,33 @@ class ListEnricher
                 continue;
             }
             $id = (int) $row->id;
-            $locked = ! ($visible[$id] ?? false);
-            $items[$i]['diary'] = $this->catalog->meta($entries[$id] ?? null, DiaryPostReader::dateOf(null, $row->created_at), $locked)
+            $preview = isset($shown[$id]) ? PreviewHtml::build((string) $row->content, $row->content_mode) : ['html' => '', 'clipped' => false];
+            $items[$i]['diary'] = $this->catalog->meta($entries[$id] ?? null, DiaryPostReader::dateOf(null, $row->created_at), ! ($visible[$id] ?? false))
                 + ['secret' => (int) $row->is_secret === 1];
-            $shown = PreviewEligibility::allows($item, $locked);
-            $items[$i]['diary_preview_html'] = $shown ? ($previews[$id]['html'] ?? '') : '';
-            $items[$i]['diary_preview_clipped'] = $shown && ($previews[$id]['clipped'] ?? false);
+            $items[$i]['diary_preview_html'] = $preview['html'];
+            $items[$i]['diary_preview_clipped'] = $preview['clipped'];
+            $items[$i]['diary_photos'] = $photos[$id]['cells'] ?? [];
+            $items[$i]['diary_photo_count'] = $photos[$id]['count'] ?? 0;
         }
         $data['data']['data'] = $items;
 
         return $data;
+    }
+
+    /**
+     * @param  array<int, mixed>  $items
+     * @return array<int, int>
+     */
+    private function ids(array $items): array
+    {
+        $ids = [];
+        foreach ($items as $item) {
+            if (is_array($item) && isset($item['id'])) {
+                $ids[] = (int) $item['id'];
+            }
+        }
+
+        return $ids;
     }
 
     /**
@@ -82,44 +102,30 @@ class ListEnricher
     }
 
     /**
-     * Previews of the visible posts. Editor images of non-secret posts are swapped for the
-     * 240 variant in a second pass (one contract call for the page); secret posts keep the
-     * original address and are never sent to the contract.
+     * Photo cells of the posts that may show them. Addresses of public posts go to the
+     * variant contract once for the page (240 variants); secret posts keep the original
+     * address and are never sent to the contract.
      *
-     * @param  array<int, object>  $rows
-     * @param  array<int, bool>  $visible
-     * @return array<int, array{html: string, clipped: bool}>
+     * @param  array<int, object>  $rows  Posts that may show photos.
+     * @return array<int, array{cells: array<int, array<string, mixed>>, count: int}>
      */
-    private function previews(array $rows, array $visible): array
+    private function photoCells(array $rows): array
     {
-        $found = [];
-        $collect = static function (string $src) use (&$found): string {
-            $found[] = $src;
-
-            return $src;
-        };
+        $hashes = $this->reader->editorPhotos(array_keys($rows));
+        $public = [];
+        foreach ($hashes as $id => $list) {
+            if ((int) $rows[$id]->is_secret !== 1) {
+                array_push($public, ...PhotoStrip::urls($list));
+            }
+        }
+        $small = $this->images->smallUrls($public);
 
         $out = [];
-        $public = [];
-        foreach ($rows as $id => $row) {
-            if (! ($visible[$id] ?? false)) {
-                continue;
-            }
-            $isPublic = (int) $row->is_secret !== 1;
-            $out[$id] = PreviewHtml::build((string) $row->content, $row->content_mode, $isPublic ? $collect : null);
-            if ($isPublic) {
-                $public[] = $id;
-            }
-        }
-
-        $small = $this->images->smallUrls($found);
-        if ($small === []) {
-            return $out;
-        }
-
-        $swap = static fn (string $src): string => $small[$src] ?? $src;
-        foreach ($public as $id) {
-            $out[$id] = PreviewHtml::build((string) $rows[$id]->content, $rows[$id]->content_mode, $swap);
+        foreach ($hashes as $id => $list) {
+            $out[$id] = [
+                'cells' => PhotoStrip::cells($list, (int) $rows[$id]->is_secret === 1 ? [] : $small),
+                'count' => count($list),
+            ];
         }
 
         return $out;
