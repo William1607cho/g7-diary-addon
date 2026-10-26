@@ -88,8 +88,8 @@
 .g7da-streak-now { font-size: 1.125rem; font-weight: 700; color: #9a3412; }
 .dark .g7da-streak-now { color: #fed7aa; }
 .g7da-streak-best { margin-top: .125rem; font-size: .8125rem; color: var(--g7da-muted); }
-.g7da-pcats { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
-.g7da-pcat { position: relative; aspect-ratio: 1 / 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .125rem; padding: .25rem; border-radius: .5rem; border: 2px solid transparent; color: var(--g7da-text); cursor: pointer; }
+.g7da-pcats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; }
+.g7da-pcat { position: relative; min-width: 0; aspect-ratio: 1 / 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .125rem; padding: .25rem; border-radius: .5rem; border: 2px solid transparent; color: var(--g7da-text); cursor: pointer; }
 .g7da-pcat.is-on { border-color: var(--g7da-accent); }
 .g7da-pcat-emoji { font-size: 1.5rem; line-height: 1.75rem; }
 .g7da-pcat-name { font-size: .6875rem; line-height: .875rem; text-align: center; overflow-wrap: anywhere; }
