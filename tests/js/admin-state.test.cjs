@@ -106,6 +106,8 @@ test('leaving a dirty tab asks; confirm drops that tab only', () => {
 test('weather: add opens the picker on nature, keys stay, saved list takes server keys', () => {
   let s = S.reduce(S.init(data()), 'weatherAdd', {});
   assert.equal(s.picker.group, 'nature');
+  assert.equal(s.picker.kind, 'emoji');
+  assert.equal(S.reduce(S.init(data()), 'pickerOpen', { list: 'weather', uid: 'w:rain' }).picker.kind, 'emoji');
   s = S.reduce(s, 'pickerPick', { value: '🌫️' });
   const uid = s.weather[2].uid;
   s = S.reduce(s, 'weatherField', { uid, value: '안개' });

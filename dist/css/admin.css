@@ -23,7 +23,7 @@
   --g7da-a-text: #f9fafb;
   --g7da-a-muted: #d1d5db;
   --g7da-a-accent: #fdba74;
-  --g7da-a-accent-bg: #431407;
+  --g7da-a-accent-bg: rgba(253, 186, 116, 0.1);
   --g7da-a-err: #fca5a5;
   --g7da-a-focus: #93c5fd;
   --g7da-a-shade: rgba(0, 0, 0, 0.6);
@@ -187,8 +187,8 @@
 /* Narrow screens: the row wraps to two lines (order + emoji + name / colour + default + delete). */
 @media (max-width: 767px) {
   .g7da-adm-panel { padding: 1rem 0.75rem; }
-  .g7da-adm-chead { display: none; }
   .g7da-adm-crow { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .g7da-adm-crow.g7da-adm-chead { display: none; }
   .g7da-adm-c-name { flex: 1 1 8rem; width: auto; }
   .g7da-adm-c-color { flex: 1 1 auto; }
   .g7da-adm-rowerr { flex: 1 1 100%; }

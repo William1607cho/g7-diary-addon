@@ -215,7 +215,7 @@
       if (s.weather.length >= MAX_WEATHER) { return; }
       var uid = newUid();
       s.weather.push({ uid: uid, key: '', emoji: '', label: '', posts: 0 });
-      s.picker = { list: 'weather', uid: uid, group: 'nature', input: '', error: '' };
+      s.picker = { kind: 'emoji', list: 'weather', uid: uid, group: 'nature', input: '', error: '' };
     },
     weatherMove: function (s, p) { var i = indexOf(s.weather, p.uid); s.weather = move(s.weather, i, i + (p.dir < 0 ? -1 : 1)); },
     weatherSorted: function (s, p) { s.weather = sorted(s.weather, p.items); },
