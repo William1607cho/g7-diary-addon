@@ -43,7 +43,6 @@
 /* `button.` raises specificity over the template Button's base classes (inline-flex items-center justify-center) */
 button.g7da-card-link { display: flex; align-items: center; justify-content: flex-start; gap: .5rem; width: 100%; padding: 0; border: 0; background: none; text-align: left; font-size: 1.21875rem; line-height: 1.75rem; color: var(--g7da-text); cursor: pointer; }
 .g7da-card-link::after { content: ""; position: absolute; inset: 0; border-radius: .75rem; }
-.g7da-card-link:focus-visible { outline: none; }
 .g7da-card-link > * { position: relative; z-index: 1; flex: none; }
 .g7da-cat, .g7da-weather { line-height: 1; }
 .g7da-date { font-weight: 600; white-space: nowrap; }
@@ -172,10 +171,10 @@ button.g7da-card-link { display: flex; align-items: center; justify-content: fle
 .g7da-cal-nav, .g7da-ppager { display: flex; align-items: center; gap: .5rem; }
 .g7da-cal-label { min-width: 4.5rem; text-align: center; font-weight: 700; color: var(--g7da-text); }
 .g7da-dow { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); text-align: center; font-size: .75rem; line-height: 1.5rem; color: var(--g7da-muted); }
-.g7da-dow .is-sun, .g7da-cc.is-sun .g7da-cc-day, .g7da-pc.is-sun { color: #dc2626; }
-.g7da-dow .is-sat, .g7da-cc.is-sat .g7da-cc-day, .g7da-pc.is-sat { color: #2563eb; }
-.dark .g7da-dow .is-sun, .dark .g7da-cc.is-sun .g7da-cc-day, .dark .g7da-pc.is-sun { color: #f87171; }
-.dark .g7da-dow .is-sat, .dark .g7da-cc.is-sat .g7da-cc-day, .dark .g7da-pc.is-sat { color: #60a5fa; }
+.g7da-dow .is-sun, .g7da-cc.is-sun .g7da-cc-day, .g7da-pc.is-sun { color: #b91c1c; }
+.g7da-dow .is-sat, .g7da-cc.is-sat .g7da-cc-day, .g7da-pc.is-sat { color: #1d4ed8; }
+.dark .g7da-dow .is-sun, .dark .g7da-cc.is-sun .g7da-cc-day, .dark .g7da-pc.is-sun { color: #fca5a5; }
+.dark .g7da-dow .is-sat, .dark .g7da-cc.is-sat .g7da-cc-day, .dark .g7da-pc.is-sat { color: #93c5fd; }
 .g7da-heat, .g7da-cal, .g7da-day { margin-bottom: 1rem; padding: 1rem; background: var(--g7da-card); border: 1px solid var(--g7da-line); border-radius: .75rem; }
 /* year heatmap (wide only): week columns of 7 days; colour = representative category; empty grey, future lighter, today ringed */
 .g7da-heat-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: .75rem; }
@@ -201,7 +200,8 @@ button.g7da-hc { width: .875rem; height: .875rem; padding: 0; border: 0; border-
 .g7da-cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .25rem; margin-top: .25rem; }
 button.g7da-cc { display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: .125rem; min-width: 0; min-height: 4.5rem; padding: .25rem .375rem; border: 2px solid transparent; border-radius: .5rem; background: #f9fafb; color: var(--g7da-text); text-align: left; cursor: pointer; }
 .dark button.g7da-cc { background: #273244; }
-.g7da-cc.is-other, .g7da-pc.is-other { opacity: .45; }
+.g7da-cc.is-other .g7da-cc-day, .g7da-pc.is-other, .dark .g7da-cc.is-other .g7da-cc-day, .dark .g7da-pc.is-other { color: var(--g7da-muted); font-weight: 400; }
+.g7da-cc.is-other .g7da-cc-emo { opacity: .5; }
 .g7da-cc.is-today, .g7da-pc.is-today { border-color: var(--g7da-text); }
 .g7da-cc.is-sel, .g7da-pc.is-sel { border-color: var(--g7da-accent); }
 .g7da-cc-day { font-size: .8125rem; font-weight: 700; }
@@ -239,7 +239,7 @@ button.g7da-pcell { position: relative; aspect-ratio: 1 / 1; min-width: 0; paddi
 .g7da-mem-layer { position: fixed; inset: 0; z-index: 70; display: flex; align-items: center; justify-content: center; padding: 1rem; }
 .g7da-mem-backdrop { position: absolute; inset: 0; background: #000000a6; }
 .g7da-mem-pop { position: relative; width: min(51.25rem, 100%); max-height: calc(100vh - 2rem); overflow-y: auto; padding: 1.25rem; border-radius: .75rem; background: var(--g7da-card); color: var(--g7da-text); box-shadow: 0 20px 40px -10px #00000066; }
-.g7da-mem-pop:focus, .g7da-mem-link:focus-visible { outline: none; }
+.g7da-card-link:focus-visible, .g7da-mem-pop:focus, .g7da-mem-link:focus-visible { outline: none; }
 .g7da-mem-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
 .g7da-mem-title { font-size: 1.25rem; font-weight: 700; }
 .g7da-mem-hint, .g7da-mem-date { margin-top: .25rem; font-size: .8125rem; color: var(--g7da-muted); }
