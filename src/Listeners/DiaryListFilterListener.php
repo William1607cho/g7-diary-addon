@@ -4,20 +4,22 @@ namespace Plugins\G7\Diary\Addon\Listeners;
 
 use App\Contracts\Extension\HookListenerInterface;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Plugins\G7\Diary\Addon\Services\DiaryPostReader;
 use Plugins\G7\Diary\Addon\Support\DiaryBoards;
 use Plugins\G7\Diary\Addon\Support\DiaryCatalog;
+use Plugins\G7\Diary\Addon\Support\DiaryCategoryFilter;
+use Plugins\G7\Diary\Addon\Support\SecretVisibility;
 
 /**
- * Category filter of diary board lists — query parameter `diary_category` (D11).
+ * Category filter of diary board lists — query parameter `diary_category` (D11 / D44).
  *
  * - `sirsoft-board.post.list_query_extensions`: on visitor lists of diary boards with a
  *   valid category id, narrows the list, the pinned rows and the count (contexts list,
- *   notice, count) to that category. The default category also matches posts without a
- *   category, with a deleted one, or without an entry row — the same rule as the cards.
+ *   notice, count) by the steps of {@see DiaryCategoryFilter::plan()}.
  * - `sirsoft-board.post.filter_list_cache_variant`: splits the post-count cache by the
- *   chosen category. Nothing is returned for other boards or without the parameter, so
- *   their queries and cache keys stay as they were.
+ *   parts of {@see DiaryCategoryFilter::cacheParts()}. Nothing is returned for other
+ *   boards or without the parameter, so their queries and cache keys stay as they were.
  */
 class DiaryListFilterListener implements HookListenerInterface
 {
@@ -29,6 +31,7 @@ class DiaryListFilterListener implements HookListenerInterface
     public function __construct(
         private readonly DiaryBoards $boards,
         private readonly DiaryCatalog $catalog,
+        private readonly SecretVisibility $visibility,
     ) {}
 
     public static function getSubscribedHooks(): array
@@ -63,8 +66,9 @@ class DiaryListFilterListener implements HookListenerInterface
         $others = $category === $this->catalog->defaultCategoryId()
             ? array_values(array_diff(array_keys($this->catalog->categoriesById()), [$category]))
             : null;
-        $conditions[] = static function (Builder $query) use ($category, $others): void {
-            self::narrow($query, $category, $others);
+        $plan = DiaryCategoryFilter::plan($category, $others, $this->visibility->isBoardWide((string) $board->slug), $this->viewerId());
+        $conditions[] = static function (Builder $query) use ($plan): void {
+            self::applyPlan($query, $plan);
         };
 
         return $conditions;
@@ -77,16 +81,16 @@ class DiaryListFilterListener implements HookListenerInterface
      */
     public function cacheVariant(mixed $parts, array $payload = []): mixed
     {
-        if (! is_array($parts) || ($payload['audience'] ?? null) !== 'user' || ! $this->boards->isDiaryBoardId($payload['board_id'] ?? null)) {
+        if (! is_array($parts) || ($payload['audience'] ?? null) !== 'user') {
+            return $parts;
+        }
+        $slug = $this->boards->diarySlugOf($payload['board_id'] ?? null);
+        $category = $slug === null ? null : $this->requestedCategory();
+        if ($category === null) {
             return $parts;
         }
 
-        $category = $this->requestedCategory();
-        if ($category !== null) {
-            $parts[] = 'g7da_cat:'.$category;
-        }
-
-        return $parts;
+        return array_merge($parts, DiaryCategoryFilter::cacheParts($category, $this->visibility->isBoardWide($slug), $this->viewerId()));
     }
 
     /**
@@ -102,20 +106,34 @@ class DiaryListFilterListener implements HookListenerInterface
         return isset($this->catalog->categoriesById()[(int) $value]) ? (int) $value : null;
     }
 
-    /**
-     * @param  array<int, int>|null  $others  For the default category: the other active ids.
-     */
-    private static function narrow(Builder $query, int $category, ?array $others): void
+    private function viewerId(): ?int
     {
-        $postId = $query->getModel()->qualifyColumn('id');
+        $id = Auth::id();
 
-        if ($others === null) {
-            $query->whereIn($postId, fn ($sub) => $sub->select('post_id')->from(DiaryPostReader::ENTRIES)->where('category_id', $category));
+        return $id === null ? null : (int) $id;
+    }
 
-            return;
+    /**
+     * @param  array<int, array<int, mixed>>  $plan
+     */
+    private static function applyPlan(Builder $query, array $plan): void
+    {
+        $model = $query->getModel();
+        $postId = $model->qualifyColumn('id');
+        $entries = static fn (string $op, mixed $value) => static fn ($sub) => $sub->select('post_id')->from(DiaryPostReader::ENTRIES)->{$op}('category_id', $value);
+
+        foreach ($plan as [$step, $value]) {
+            match ($step) {
+                'in_category' => $query->whereIn($postId, $entries('where', $value)),
+                'not_in_categories' => $query->whereNotIn($postId, $entries('whereIn', $value)),
+                'secret_visible_to' => $query->where(static function ($q) use ($model, $value): void {
+                    $q->where($model->qualifyColumn('is_secret'), false);
+                    if ($value !== null) {
+                        $q->orWhere($model->qualifyColumn('user_id'), $value);
+                    }
+                }),
+                default => null,
+            };
         }
-
-        // Default: every post that does NOT carry another active category.
-        $query->whereNotIn($postId, fn ($sub) => $sub->select('post_id')->from(DiaryPostReader::ENTRIES)->whereIn('category_id', $others === [] ? [0] : $others));
     }
 }

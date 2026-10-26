@@ -56,7 +56,10 @@ class SecretVisibility
         return $out + $this->askGate($pending, $request);
     }
 
-    private function isBoardWide(string $slug): bool
+    /**
+     * Board-wide secret access (board manager) — D7 first step, memoized per request.
+     */
+    public function isBoardWide(string $slug): bool
     {
         return $this->boardWide[$slug] ??= $this->checkBoardPermission($slug, 'manager', PermissionType::User);
     }

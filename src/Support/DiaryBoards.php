@@ -23,6 +23,9 @@ class DiaryBoards
     /** @var array<int, bool> */
     private array $byId = [];
 
+    /** @var array<int, string|null> */
+    private array $slugById = [];
+
     public function isDiarySlug(mixed $slug): bool
     {
         if (! is_string($slug) || $slug === '') {
@@ -40,5 +43,22 @@ class DiaryBoards
         }
 
         return $this->byId[$boardId] ??= DB::table('boards')->where('id', $boardId)->value('type') === self::TYPE;
+    }
+
+    /**
+     * Slug of a diary board by id, or null when the board is not a diary board.
+     */
+    public function diarySlugOf(mixed $boardId): ?string
+    {
+        $boardId = (int) $boardId;
+        if ($boardId <= 0) {
+            return null;
+        }
+        if (! array_key_exists($boardId, $this->slugById)) {
+            $row = DB::table('boards')->where('id', $boardId)->first(['slug', 'type']);
+            $this->slugById[$boardId] = $row !== null && $row->type === self::TYPE ? (string) $row->slug : null;
+        }
+
+        return $this->slugById[$boardId];
     }
 }

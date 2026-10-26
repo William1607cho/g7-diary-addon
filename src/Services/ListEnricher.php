@@ -4,6 +4,7 @@ namespace Plugins\G7\Diary\Addon\Services;
 
 use Plugins\G7\Diary\Addon\Support\DiaryCatalog;
 use Plugins\G7\Diary\Addon\Support\ImageVariants;
+use Plugins\G7\Diary\Addon\Support\PreviewEligibility;
 use Plugins\G7\Diary\Addon\Support\PreviewHtml;
 use Plugins\G7\Diary\Addon\Support\SecretVisibility;
 
@@ -58,8 +59,9 @@ class ListEnricher
             $locked = ! ($visible[$id] ?? false);
             $items[$i]['diary'] = $this->catalog->meta($entries[$id] ?? null, DiaryPostReader::dateOf(null, $row->created_at), $locked)
                 + ['secret' => (int) $row->is_secret === 1];
-            $items[$i]['diary_preview_html'] = $locked ? '' : ($previews[$id]['html'] ?? '');
-            $items[$i]['diary_preview_clipped'] = ! $locked && ($previews[$id]['clipped'] ?? false);
+            $shown = PreviewEligibility::allows($item, $locked);
+            $items[$i]['diary_preview_html'] = $shown ? ($previews[$id]['html'] ?? '') : '';
+            $items[$i]['diary_preview_clipped'] = $shown && ($previews[$id]['clipped'] ?? false);
         }
         $data['data']['data'] = $items;
 
