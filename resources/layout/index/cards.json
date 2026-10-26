@@ -1,8 +1,15 @@
 {
-  "comment": "Card list — one card per post (notices = pinned cards, orange border). Order is the board's own (D10).",
+  "comment": "Card list — one card per post (notices = pinned cards, orange border). Order is the board's own (D10). The iteration node itself repeats, so it is the per-card wrapper inside the list container.",
   "type": "basic",
   "name": "Div",
   "props": { "className": "g7da-cards" },
-  "iteration": { "source": "{{posts?.data?.data ?? []}}", "item_var": "post" },
-  "children": [ { "g7da_include": "index/card" } ]
+  "children": [
+    {
+      "type": "basic",
+      "name": "Div",
+      "iteration": { "source": "{{posts?.data?.data ?? []}}", "item_var": "post" },
+      "props": { "className": "g7da-card-slot" },
+      "children": [ { "g7da_include": "index/card" } ]
+    }
+  ]
 }

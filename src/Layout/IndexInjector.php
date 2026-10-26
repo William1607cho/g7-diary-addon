@@ -38,6 +38,32 @@ final class IndexInjector
     }
 
     /**
+     * Forwards `diary_category` from the address to the list data source (D57). The template's
+     * `posts` source names its parameters one by one, so without this the filter never reaches
+     * the API. On other boards the value is empty and the filter listener ignores it.
+     *
+     * @param  array<int, mixed>  $sources  Layout `data_sources`.
+     * @return array{0: array<int, mixed>, 1: string} applied|already|no_anchor
+     */
+    public static function withFilterParam(array $sources): array
+    {
+        foreach ($sources as $i => $source) {
+            if (! is_array($source) || ($source['id'] ?? null) !== 'posts' || ! Tree::strHas($source['endpoint'] ?? null, '/boards/{{route.slug}}/posts')) {
+                continue;
+            }
+            if (isset($source['params']['diary_category'])) {
+                return [$sources, 'already'];
+            }
+            $sources[$i]['params'] = (is_array($source['params'] ?? null) ? $source['params'] : [])
+                + ['diary_category' => "{{query.diary_category ?? ''}}"];
+
+            return [$sources, 'applied'];
+        }
+
+        return [$sources, 'no_anchor'];
+    }
+
+    /**
      * @param  array<string, mixed>  $node
      */
     public static function isFallback(array $node): bool

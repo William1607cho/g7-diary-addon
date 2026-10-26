@@ -53,6 +53,11 @@ class DiaryLayoutListener implements HookListenerInterface
 
         try {
             [$components, $report] = $injector->apply($layout['components']);
+            if ($injector instanceof IndexInjector) {
+                [$layout['data_sources'], $report['filter_param']] = IndexInjector::withFilterParam(
+                    is_array($layout['data_sources'] ?? null) ? $layout['data_sources'] : []
+                );
+            }
         } catch (\Throwable $e) {
             Log::warning('[g7-diary-addon] layout injection failed, layout left unchanged', [
                 'layout' => $layout['layout_name'], 'template_id' => $templateId, 'error' => $e->getMessage(),

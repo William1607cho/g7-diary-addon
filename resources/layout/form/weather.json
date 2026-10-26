@@ -7,11 +7,11 @@
     "role": "group",
     "aria-label": "$t:g7-diary-addon.weather"
   },
-  "iteration": { "source": "{{form_meta?.data?.diary?.weather_options ?? []}}", "item_var": "w" },
   "children": [
     {
       "type": "basic",
       "name": "Button",
+      "iteration": { "source": "{{form_meta?.data?.diary?.weather_options ?? []}}", "item_var": "w" },
       "props": {
         "type": "button",
         "className": "{{'g7da-wbtn' + (_local.form?.diary_weather === w.key ? ' is-on' : '')}}",

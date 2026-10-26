@@ -12,11 +12,11 @@
         "role": "group",
         "aria-label": "$t:g7-diary-addon.categories"
       },
-      "iteration": { "source": "{{form_meta?.data?.diary?.categories ?? []}}", "item_var": "cat" },
       "children": [
         {
           "type": "basic",
           "name": "Button",
+          "iteration": { "source": "{{form_meta?.data?.diary?.categories ?? []}}", "item_var": "cat" },
           "props": {
             "type": "button",
             "className": "{{'g7da-fcat' + (_local.form?.diary_category_id == cat.id ? ' is-on' : '')}}",

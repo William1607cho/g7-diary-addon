@@ -162,6 +162,38 @@ class LayoutInjectionTest extends TestCase
         $this->assertSame('applied', $report['title']);
     }
 
+    public function test_list_data_source_forwards_the_filter_parameter(): void
+    {
+        $sources = [
+            ['id' => 'other', 'endpoint' => '/x', 'params' => []],
+            ['id' => 'posts', 'endpoint' => '/api/modules/sirsoft-board/boards/{{route.slug}}/posts', 'params' => ['page' => '{{query.page ?? 1}}']],
+        ];
+        [$out, $r] = IndexInjector::withFilterParam($sources);
+
+        $this->assertSame('applied', $r);
+        $this->assertSame(['page' => '{{query.page ?? 1}}', 'diary_category' => "{{query.diary_category ?? ''}}"], $out[1]['params']);
+        $this->assertSame($sources[0], $out[0]);
+        $this->assertSame('already', IndexInjector::withFilterParam($out)[1]);
+        $this->assertSame('no_anchor', IndexInjector::withFilterParam([$sources[0]])[1]);
+    }
+
+    public function test_grids_repeat_their_items_not_themselves(): void
+    {
+        // The engine repeats the node that carries `iteration`; a grid / row container must not carry it.
+        $f = $this->fragments();
+        foreach (['index/mobile-categories', 'index/panel-categories', 'form/weather'] as $name) {
+            $node = $f->get($name);
+            $this->assertFalse(isset($node['iteration']), $name);
+            $this->assertTrue(isset($node['children'][0]['iteration']), $name);
+        }
+        $cats = $f->get('form/categories');
+        $this->assertFalse(isset($cats['children'][0]['iteration']));
+        $this->assertTrue(isset($cats['children'][0]['children'][0]['iteration']));
+        $cards = $f->get('index/cards');
+        $this->assertFalse(isset($cards['iteration']));
+        $this->assertTrue(isset($cards['children'][0]['iteration']));
+    }
+
     public function test_and_condition_keeps_existing_expression(): void
     {
         $this->assertSame("{{(a || b) && x !== 'diary'}}", Tree::andCondition('{{a || b}}', "x !== 'diary'"));

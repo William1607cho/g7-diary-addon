@@ -7,11 +7,11 @@
     "role": "group",
     "aria-label": "$t:g7-diary-addon.category_filter"
   },
-  "iteration": { "source": "{{_local.g7daSummary?.categories ?? []}}", "item_var": "cat" },
   "children": [
     {
       "type": "basic",
       "name": "Button",
+      "iteration": { "source": "{{_local.g7daSummary?.categories ?? []}}", "item_var": "cat" },
       "props": {
         "type": "button",
         "className": "{{'g7da-pcat' + (query.diary_category == cat.id ? ' is-on' : '')}}",
