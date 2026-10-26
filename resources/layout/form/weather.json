@@ -1,0 +1,38 @@
+{
+  "comment": "Weather emoji buttons from the weather_options setting. Optional; pressing the chosen one again clears it.",
+  "type": "basic",
+  "name": "Div",
+  "props": {
+    "className": "g7da-weathers",
+    "role": "group",
+    "aria-label": "$t:g7-diary-addon.weather"
+  },
+  "iteration": { "source": "{{form_meta?.data?.diary?.weather_options ?? []}}", "item_var": "w" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Button",
+      "props": {
+        "type": "button",
+        "className": "{{'g7da-wbtn' + (_local.form?.diary_weather === w.key ? ' is-on' : '')}}",
+        "aria-pressed": "{{_local.form?.diary_weather === w.key ? 'true' : 'false'}}",
+        "aria-label": "{{w.label}}",
+        "data-g7da-tip": "{{w.label}}"
+      },
+      "actions": [
+        {
+          "type": "click",
+          "handler": "setState",
+          "params": {
+            "target": "local",
+            "form": { "diary_weather": "{{_local.form?.diary_weather === w.key ? null : w.key}}" },
+            "hasChanges": true
+          }
+        }
+      ],
+      "children": [
+        { "type": "basic", "name": "Span", "props": { "aria-hidden": "true" }, "text": "{{w.emoji}}" }
+      ]
+    }
+  ]
+}

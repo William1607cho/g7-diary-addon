@@ -1,0 +1,14 @@
+{
+  "comment": "Infinite scroll step 1: mark loading; keep the current page of this list (from the state when its key matches, else the loaded first page).",
+  "handler": "setState",
+  "params": {
+    "target": "local",
+    "g7daMore": {
+      "key": "{{route.slug + '|' + (query.diary_category ?? '') + '|' + (query.search ?? '') + '|' + (posts?.data?.pagination?.current_page ?? 1)}}",
+      "page": "{{_local.g7daMore?.key === (route.slug + '|' + (query.diary_category ?? '') + '|' + (query.search ?? '') + '|' + (posts?.data?.pagination?.current_page ?? 1)) ? _local.g7daMore.page : (posts?.data?.pagination?.current_page ?? 1)}}",
+      "hasMore": true,
+      "loading": true,
+      "failed": false
+    }
+  }
+}

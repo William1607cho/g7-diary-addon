@@ -1,0 +1,44 @@
+{
+  "comment": "Infinite scroll step 2: fetch the next page with the same filters as the list, append the new rows (pinned rows already shown are dropped), store the page and has_more_pages. On error the button stays for a manual retry.",
+  "handler": "apiCall",
+  "auth_mode": "optional",
+  "target": "/api/modules/sirsoft-board/boards/{{route.slug}}/posts",
+  "params": {
+    "method": "GET",
+    "query": {
+      "page": "{{(_local.g7daMore?.page ?? 1) + 1}}",
+      "search": "{{query.search ?? ''}}",
+      "category": "{{query.category ?? ''}}",
+      "diary_category": "{{query.diary_category ?? ''}}",
+      "del": "{{query.del ?? ''}}"
+    }
+  },
+  "onSuccess": [
+    {
+      "handler": "appendDataSource",
+      "params": {
+        "dataSourceId": "posts",
+        "dataPath": "data.data",
+        "newData": "{{(response?.data?.data ?? []).filter(function(p){ return !(posts?.data?.data ?? []).some(function(q){ return q.id === p.id; }); })}}"
+      }
+    },
+    {
+      "handler": "setState",
+      "params": {
+        "target": "local",
+        "g7daMore": {
+          "page": "{{response?.data?.pagination?.current_page ?? ((_local.g7daMore?.page ?? 1) + 1)}}",
+          "hasMore": "{{response?.data?.pagination?.has_more_pages === true}}",
+          "loading": false,
+          "failed": false
+        }
+      }
+    }
+  ],
+  "onError": [
+    {
+      "handler": "setState",
+      "params": { "target": "local", "g7daMore": { "loading": false, "failed": true } }
+    }
+  ]
+}

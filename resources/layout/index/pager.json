@@ -1,0 +1,49 @@
+{
+  "comment": "List display mode (D15 / D41): paginate = the template's page buttons; infinite = next pages appended with appendDataSource. State _local.g7daMore = {key, page, hasMore, loading, failed}; key ties it to the loaded list (board, filter, search, first page), so a new list starts fresh. The plugin script clicks the button when it scrolls into view (data-g7da-more=auto); after a failed load the button stays for a manual retry. Pinned rows that come again on later pages are dropped while appending.",
+  "type": "basic",
+  "name": "Div",
+  "props": { "className": "g7da-pager" },
+  "children": [
+    {
+      "type": "composite",
+      "name": "Pagination",
+      "if": "{{posts?.data?.diary?.display_mode !== 'infinite'}}",
+      "props": {
+        "currentPage": "{{posts?.data?.pagination?.current_page ?? 1}}",
+        "totalPages": "{{posts?.data?.pagination?.last_page ?? null}}",
+        "hasMorePages": "{{posts?.data?.pagination?.has_more_pages ?? false}}",
+        "className": "justify-center"
+      },
+      "actions": [
+        {
+          "event": "onPageChange",
+          "handler": "navigate",
+          "params": { "path": "/board/{{route?.slug}}", "mergeQuery": true, "query": { "page": "{{$args[0]}}" } }
+        }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Button",
+      "if": "{{posts?.data?.diary?.display_mode === 'infinite' && ((_local.g7daMore?.key === (route.slug + '|' + (query.diary_category ?? '') + '|' + (query.search ?? '') + '|' + (posts?.data?.pagination?.current_page ?? 1))) ? _local.g7daMore.hasMore : posts?.data?.pagination?.has_more_pages) === true}}",
+      "props": {
+        "type": "button",
+        "className": "g7da-more",
+        "disabled": "{{_local.g7daMore?.loading === true}}",
+        "data-g7da-more": "{{_local.g7daMore?.failed ? 'manual' : 'auto'}}",
+        "data-testid": "g7da-more"
+      },
+      "actions": [
+        {
+          "type": "click",
+          "handler": "sequence",
+          "actions": [
+            { "g7da_include": "index/more-start" },
+            { "g7da_include": "index/more-fetch" }
+          ]
+        }
+      ],
+      "text": "{{_local.g7daMore?.loading ? '$t:g7-diary-addon.loading' : '$t:g7-diary-addon.more'}}"
+    }
+  ]
+}

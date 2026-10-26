@@ -1,0 +1,14 @@
+{
+  "comment": "Empty list message (no posts / nothing for the current filter or search).",
+  "type": "basic",
+  "name": "Div",
+  "if": "{{(posts?.data?.data ?? []).length === 0}}",
+  "props": { "className": "g7da-empty" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "P",
+      "text": "{{(query.search || query.diary_category) ? '$t:g7-diary-addon.empty_filtered' : '$t:g7-diary-addon.empty'}}"
+    }
+  ]
+}

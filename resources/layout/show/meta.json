@@ -1,0 +1,33 @@
+{
+  "id": "g7da_show_meta",
+  "comment": "g7-diary-addon: diary info line above the title (diary boards only) — category chip, diary date (bold, long form), weather (left out when none). Locked secret posts show the date only.",
+  "type": "basic",
+  "name": "Div",
+  "if": "{{post?.data?.board?.type === 'diary' && post?.data?.diary}}",
+  "props": { "className": "g7da-show-meta", "data-g7da": "show-meta" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Span",
+      "if": "{{post?.data?.diary?.category}}",
+      "props": {
+        "className": "g7da-chip",
+        "style": { "backgroundColor": "{{(post?.data?.diary?.category?.color ?? '#9CA3AF') + '26'}}" }
+      },
+      "text": "{{post?.data?.diary?.category?.emoji ?? ''}} {{post?.data?.diary?.category?.name ?? ''}}"
+    },
+    {
+      "type": "basic",
+      "name": "Span",
+      "props": { "className": "g7da-show-date" },
+      "text": "{{post?.data?.diary?.date_long ?? ''}}"
+    },
+    {
+      "type": "basic",
+      "name": "Span",
+      "if": "{{post?.data?.diary?.weather}}",
+      "props": { "className": "g7da-show-weather" },
+      "text": "{{post?.data?.diary?.weather?.emoji ?? ''}} {{post?.data?.diary?.weather?.label ?? ''}}"
+    }
+  ]
+}

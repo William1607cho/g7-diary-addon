@@ -1,0 +1,21 @@
+{
+  "id": "g7da_form_fields",
+  "comment": "g7-diary-addon: diary fields of the write / edit form (diary boards only). Row 1: diary date, weather buttons, small Pinned / Secret checkboxes at the end (they replace the template's big option cards, which are hidden on diary boards). Row 2: 7 square category boxes + hint. Values live in _local.form (diary_date, diary_weather, diary_category_id) and go with the save request.",
+  "type": "basic",
+  "name": "Div",
+  "if": "{{form_meta?.data?.board?.type === 'diary' && form_meta?.data?.diary}}",
+  "props": { "className": "g7da-form", "data-g7da": "form" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-form-row" },
+      "children": [
+        { "g7da_include": "form/date" },
+        { "g7da_include": "form/weather" },
+        { "g7da_include": "form/options" }
+      ]
+    },
+    { "g7da_include": "form/categories" }
+  ]
+}

@@ -4,7 +4,10 @@ namespace Plugins\G7\Diary\Addon\Providers;
 
 use App\Extension\BasePluginServiceProvider;
 use Plugins\G7\Diary\Addon\Support\DiaryBoards;
+use Plugins\G7\Diary\Addon\Support\DiaryCatalog;
+use Plugins\G7\Diary\Addon\Support\ImageVariants;
 use Plugins\G7\Diary\Addon\Support\PendingDiaryMeta;
+use Plugins\G7\Diary\Addon\Support\SecretVisibility;
 
 /**
  * Diary add-on service provider.
@@ -12,9 +15,11 @@ use Plugins\G7\Diary\Addon\Support\PendingDiaryMeta;
  * The core PluginServiceProvider discovers `src/Providers/*ServiceProvider.php`; routes,
  * migrations and hook listeners are picked up by convention.
  *
- * Two request-scoped services: the board-type memo and the store that carries the diary
- * fields from the data filters to the after-save hooks (listeners are resolved fresh for
- * every hook call, so they cannot keep state themselves). No repository is rebound.
+ * Request-scoped services: the board-type memo, the store that carries the diary fields
+ * from the data filters to the after-save hooks (listeners are resolved fresh for every
+ * hook call, so they cannot keep state themselves), the display catalog (categories,
+ * settings), the board-wide secret check memo and the image-delivery presence check.
+ * No repository is rebound.
  */
 class DiaryAddonServiceProvider extends BasePluginServiceProvider
 {
@@ -26,5 +31,8 @@ class DiaryAddonServiceProvider extends BasePluginServiceProvider
 
         $this->app->scoped(DiaryBoards::class);
         $this->app->scoped(PendingDiaryMeta::class);
+        $this->app->scoped(DiaryCatalog::class);
+        $this->app->scoped(SecretVisibility::class);
+        $this->app->scoped(ImageVariants::class);
     }
 }

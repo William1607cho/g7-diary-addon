@@ -1,0 +1,20 @@
+{
+  "comment": "Streak box — by diary date in the site time zone (summary API, D38).",
+  "type": "basic",
+  "name": "Div",
+  "props": { "className": "g7da-streak" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "P",
+      "props": { "className": "g7da-streak-now" },
+      "text": "$t:g7-diary-addon.streak_current|count={{_local.g7daSummary?.streak?.current ?? 0}}"
+    },
+    {
+      "type": "basic",
+      "name": "P",
+      "props": { "className": "g7da-streak-best" },
+      "text": "$t:g7-diary-addon.streak_longest|count={{_local.g7daSummary?.streak?.longest ?? 0}}"
+    }
+  ]
+}

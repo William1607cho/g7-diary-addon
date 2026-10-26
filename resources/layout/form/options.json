@@ -1,0 +1,39 @@
+{
+  "comment": "Small Pinned / Secret checkboxes. Same fields and conditions as the template's option cards: Pinned = is_notice (board managers, not on replies); Secret = is_secret (board secret mode enabled; always-mode shows a fixed checked box + hidden value like the template). Secret is unchecked by default.",
+  "type": "basic",
+  "name": "Div",
+  "props": { "className": "g7da-opts" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Label",
+      "if": "{{form_meta?.data?.board?.user_abilities?.can_manage && !_local.form?.parent_id}}",
+      "props": { "className": "g7da-check" },
+      "children": [
+        { "type": "basic", "name": "Input", "props": { "type": "checkbox", "name": "is_notice", "className": "g7da-check-box" } },
+        { "type": "basic", "name": "Span", "text": "$t:g7-diary-addon.pinned" }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Label",
+      "if": "{{form_meta?.data?.board?.secret_mode === 'enabled'}}",
+      "props": { "className": "g7da-check" },
+      "children": [
+        { "type": "basic", "name": "Input", "props": { "type": "checkbox", "name": "is_secret", "className": "g7da-check-box" } },
+        { "type": "basic", "name": "Span", "text": "$t:g7-diary-addon.secret" }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Label",
+      "if": "{{form_meta?.data?.board?.secret_mode === 'always'}}",
+      "props": { "className": "g7da-check is-fixed" },
+      "children": [
+        { "type": "basic", "name": "Input", "props": { "type": "hidden", "name": "is_secret", "value": "true" } },
+        { "type": "basic", "name": "Input", "props": { "type": "checkbox", "checked": true, "disabled": true, "className": "g7da-check-box" } },
+        { "type": "basic", "name": "Span", "text": "$t:g7-diary-addon.secret" }
+      ]
+    }
+  ]
+}

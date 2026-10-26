@@ -1,0 +1,40 @@
+{
+  "comment": "Category buttons: square boxes, 3 per row — big emoji, name below, post count badge (D6: secret posts the viewer cannot open are not counted). Selected = orange border; pressing it again clears the filter.",
+  "type": "basic",
+  "name": "Div",
+  "props": {
+    "className": "g7da-pcats",
+    "role": "group",
+    "aria-label": "$t:g7-diary-addon.category_filter"
+  },
+  "iteration": { "source": "{{_local.g7daSummary?.categories ?? []}}", "item_var": "cat" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Button",
+      "props": {
+        "type": "button",
+        "className": "{{'g7da-pcat' + (query.diary_category == cat.id ? ' is-on' : '')}}",
+        "style": { "backgroundColor": "{{cat.color + '1F'}}" },
+        "aria-pressed": "{{query.diary_category == cat.id ? 'true' : 'false'}}",
+        "aria-label": "{{cat.name + ' ' + cat.count}}"
+      },
+      "actions": [
+        {
+          "type": "click",
+          "handler": "navigate",
+          "params": {
+            "path": "/board/{{route.slug}}",
+            "mergeQuery": true,
+            "query": { "diary_category": "{{query.diary_category == cat.id ? '' : cat.id}}", "page": 1 }
+          }
+        }
+      ],
+      "children": [
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-pcat-emoji", "aria-hidden": "true" }, "text": "{{cat.emoji}}" },
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-pcat-name", "aria-hidden": "true" }, "text": "{{cat.name}}" },
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-pcat-count", "aria-hidden": "true" }, "text": "{{cat.count}}" }
+      ]
+    }
+  ]
+}

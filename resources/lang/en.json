@@ -1,0 +1,22 @@
+{
+  "search": "Search",
+  "write": "Write",
+  "panel_open": "Open diary panel",
+  "panel_close": "Close diary panel",
+  "categories": "Categories",
+  "category_filter": "Filter by category",
+  "streak_current": "Day {{count}} in a row",
+  "streak_longest": "Longest streak: {{count}} days",
+  "secret": "Secret",
+  "pinned": "Pinned",
+  "comments": "{{count}} comments",
+  "more": "Load more",
+  "loading": "Loading…",
+  "empty": "No diary entries yet.",
+  "empty_filtered": "No entries match this filter.",
+  "diary_date": "Diary date",
+  "weather": "Weather",
+  "category_hint": "Defaults to {{name}}",
+  "title_placeholder": "Leave empty to use the first line of the text",
+  "deleted": "Deleted"
+}

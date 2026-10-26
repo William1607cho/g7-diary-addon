@@ -1,0 +1,8 @@
+{
+  "comment": "Card list — one card per post (notices = pinned cards, orange border). Order is the board's own (D10).",
+  "type": "basic",
+  "name": "Div",
+  "props": { "className": "g7da-cards" },
+  "iteration": { "source": "{{posts?.data?.data ?? []}}", "item_var": "post" },
+  "children": [ { "g7da_include": "index/card" } ]
+}

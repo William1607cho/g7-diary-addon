@@ -1,0 +1,43 @@
+{
+  "comment": "Wide screens only (CSS): a half-round tab fixed at the left edge, vertical centre, opens / closes the panel (the only way to close it — no X, no outside click, no overlay). The panel slides out into the space left of the list. Contents: streak box, (bundle 3: month calendar slot), category buttons 3 per row. Choosing a category keeps the panel open.",
+  "type": "basic",
+  "name": "Div",
+  "props": { "className": "g7da-panel-root" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Button",
+      "props": {
+        "type": "button",
+        "className": "{{'g7da-tab' + (_local.g7daPanel ? ' is-open' : '')}}",
+        "aria-expanded": "{{_local.g7daPanel ? 'true' : 'false'}}",
+        "aria-controls": "g7da-panel",
+        "aria-label": "{{_local.g7daPanel ? '$t:g7-diary-addon.panel_close' : '$t:g7-diary-addon.panel_open'}}",
+        "data-g7da-tip": "{{_local.g7daPanel ? '$t:g7-diary-addon.panel_close' : '$t:g7-diary-addon.panel_open'}}",
+        "data-testid": "g7da-tab"
+      },
+      "actions": [
+        { "type": "click", "handler": "setState", "params": { "target": "local", "g7daPanel": "{{!_local.g7daPanel}}" } }
+      ],
+      "children": [
+        { "type": "basic", "name": "Icon", "props": { "name": "{{_local.g7daPanel ? 'chevron-left' : 'chevron-right'}}", "aria-hidden": "true" } }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": {
+        "id": "g7da-panel",
+        "role": "complementary",
+        "className": "{{'g7da-panel' + (_local.g7daPanel ? ' is-open' : '')}}",
+        "aria-hidden": "{{_local.g7daPanel ? 'false' : 'true'}}",
+        "data-testid": "g7da-panel"
+      },
+      "children": [
+        { "g7da_include": "index/panel-streak" },
+        { "g7da_slot": "bundle3_month_calendar" },
+        { "g7da_include": "index/panel-categories" }
+      ]
+    }
+  ]
+}

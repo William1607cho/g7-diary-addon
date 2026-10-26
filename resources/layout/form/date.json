@@ -1,0 +1,28 @@
+{
+  "comment": "Diary date — default today in the site time zone (form-data), future dates not selectable (max = today; the server checks it as well).",
+  "type": "basic",
+  "name": "Label",
+  "props": { "className": "g7da-date-field" },
+  "children": [
+    { "type": "basic", "name": "Span", "props": { "className": "g7da-sr" }, "text": "$t:g7-diary-addon.diary_date" },
+    {
+      "type": "basic",
+      "name": "Input",
+      "props": {
+        "type": "date",
+        "name": "diary_date",
+        "max": "{{form_meta?.data?.diary?.today ?? ''}}",
+        "required": true,
+        "className": "g7da-date-input",
+        "aria-label": "$t:g7-diary-addon.diary_date"
+      }
+    },
+    {
+      "type": "basic",
+      "name": "Span",
+      "if": "{{_local.errors?.diary_date}}",
+      "props": { "className": "g7da-error" },
+      "text": "{{_local.errors?.diary_date?.[0] ?? _local.errors?.diary_date}}"
+    }
+  ]
+}

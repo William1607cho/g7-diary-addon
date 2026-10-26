@@ -1,0 +1,40 @@
+{
+  "comment": "Narrow screens only (CSS): one row of category emoji cells on the category colour; name in tooltip and aria-label; wraps when it does not fit. Same toggle as the panel buttons.",
+  "type": "basic",
+  "name": "Div",
+  "if": "{{(_local.g7daSummary?.categories ?? []).length > 0}}",
+  "props": {
+    "className": "g7da-mcats",
+    "role": "group",
+    "aria-label": "$t:g7-diary-addon.category_filter"
+  },
+  "iteration": { "source": "{{_local.g7daSummary?.categories ?? []}}", "item_var": "cat" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Button",
+      "props": {
+        "type": "button",
+        "className": "{{'g7da-mcat' + (query.diary_category == cat.id ? ' is-on' : '')}}",
+        "style": { "backgroundColor": "{{cat.color + '33'}}" },
+        "aria-label": "{{cat.name}}",
+        "aria-pressed": "{{query.diary_category == cat.id ? 'true' : 'false'}}",
+        "data-g7da-tip": "{{cat.name}}"
+      },
+      "actions": [
+        {
+          "type": "click",
+          "handler": "navigate",
+          "params": {
+            "path": "/board/{{route.slug}}",
+            "mergeQuery": true,
+            "query": { "diary_category": "{{query.diary_category == cat.id ? '' : cat.id}}", "page": 1 }
+          }
+        }
+      ],
+      "children": [
+        { "type": "basic", "name": "Span", "props": { "aria-hidden": "true" }, "text": "{{cat.emoji}}" }
+      ]
+    }
+  ]
+}

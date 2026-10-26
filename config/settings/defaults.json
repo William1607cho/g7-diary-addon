@@ -1,6 +1,6 @@
 {
     "_meta": {
-        "version": "0.1.0",
+        "version": "0.2.0",
         "description": "일기장 게시판 애드온 환경설정 (날씨 목록 / 자동 제목 / 목록·사진 표시 방식)"
     },
     "defaults": {
@@ -16,6 +16,7 @@
         "photo_diary_title": "(사진 일기)",
         "memories_empty_text": "힘내서 일기 좀 더 써 주세요",
         "list_display_mode": "paginate",
+        "list_page_size": 0,
         "photo_display_mode": "infinite",
         "photo_page_size": 30
     },
@@ -25,6 +26,7 @@
         "photo_diary_title": {"expose": false},
         "memories_empty_text": {"expose": false},
         "list_display_mode": {"expose": false},
+        "list_page_size": {"expose": false},
         "photo_display_mode": {"expose": false},
         "photo_page_size": {"expose": false}
     }

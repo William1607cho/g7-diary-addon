@@ -1,0 +1,42 @@
+{
+  "comment": "Write button — same permission / login flow as the template's list write button (partials/board/index/_write_button.json), dark accent, custom tooltip instead of title.",
+  "type": "basic",
+  "name": "Button",
+  "props": {
+    "type": "button",
+    "className": "g7da-icon-btn g7da-icon-btn--strong",
+    "aria-label": "$t:g7-diary-addon.write",
+    "data-g7da-tip": "$t:g7-diary-addon.write",
+    "data-testid": "g7da-write",
+    "disabled": "{{posts?.data?.abilities?.can_write !== true}}"
+  },
+  "actions": [
+    {
+      "type": "click",
+      "handler": "switch",
+      "params": {
+        "value": "{{posts?.data?.abilities?.can_write ? 'allowed' : (_global.currentUser?.uuid ? 'no_permission' : 'not_logged_in')}}"
+      },
+      "cases": {
+        "allowed": {
+          "handler": "navigate",
+          "params": { "path": "/board/{{route.slug}}/write", "mergeQuery": true, "query": {} }
+        },
+        "no_permission": {
+          "handler": "toast",
+          "params": { "type": "warning", "message": "$t:board.no_write_permission" }
+        },
+        "not_logged_in": {
+          "handler": "sequence",
+          "actions": [
+            { "handler": "toast", "params": { "type": "info", "message": "$t:board.login_required_to_write" } },
+            { "handler": "navigate", "params": { "path": "/login", "query": { "redirect": "/board/{{route.slug}}/write" } } }
+          ]
+        }
+      }
+    }
+  ],
+  "children": [
+    { "type": "basic", "name": "Icon", "props": { "name": "pencil-alt", "aria-hidden": "true" } }
+  ]
+}

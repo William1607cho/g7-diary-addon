@@ -1,0 +1,31 @@
+{
+  "comment": "Search row, opened by the search icon (or shown while a search is active). Same search as the board list (query.search, page 1); the category filter stays in the address.",
+  "type": "basic",
+  "name": "Div",
+  "if": "{{_local.g7daSearchOpen || query.search}}",
+  "props": { "className": "g7da-search" },
+  "children": [
+    {
+      "type": "composite",
+      "name": "SearchBar",
+      "props": {
+        "name": "search",
+        "placeholder": "$t:board.search_placeholder",
+        "value": "{{query.search || ''}}",
+        "showButton": false,
+        "className": "w-full"
+      },
+      "actions": [
+        {
+          "type": "submit",
+          "handler": "navigate",
+          "params": {
+            "path": "/board/{{route.slug}}",
+            "mergeQuery": true,
+            "query": { "search": "{{$event.target.search.value}}", "page": 1 }
+          }
+        }
+      ]
+    }
+  ]
+}

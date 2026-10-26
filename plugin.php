@@ -4,24 +4,31 @@ namespace Plugins\G7\Diary\Addon;
 
 use App\Extension\AbstractPlugin;
 use Illuminate\Support\Facades\DB;
+use Plugins\G7\Diary\Addon\Http\Middleware\DiaryListPageSize;
+use Plugins\G7\Diary\Addon\Http\Middleware\DiaryResponseExtension;
 use Plugins\G7\Diary\Addon\Listeners\BoardTypeSeedListener;
+use Plugins\G7\Diary\Addon\Listeners\DiaryLayoutListener;
+use Plugins\G7\Diary\Addon\Listeners\DiaryListFilterListener;
 use Plugins\G7\Diary\Addon\Listeners\DiaryPurgeListener;
 use Plugins\G7\Diary\Addon\Listeners\DiarySaveListener;
 use Plugins\G7\Diary\Addon\Listeners\DiaryValidationListener;
 use Plugins\G7\Diary\Addon\Support\DiaryBoards;
 use Plugins\G7\Diary\Addon\Support\DiaryCategories;
 use Plugins\G7\Diary\Addon\Support\DiarySettings;
+use Plugins\G7\Diary\Addon\Support\DiarySettingsSchema;
 
 /**
- * Diary Board Add-on (g7-diary-addon) — bundle 1: board type, tables, save flow.
+ * Diary Board Add-on (g7-diary-addon) — bundles 1–2: board type, tables, save flow, and
+ * the list / show / write screens.
  *
  * Adds a `diary` board type to sirsoft-board. On diary boards the title is optional and
  * filled automatically, and each post gets diary metadata (category, weather, diary date)
- * and a photo index in the add-on's own tables. sirsoft-board and the visitor template
- * are not modified, and no repository is rebound — everything goes through hooks.
+ * and a photo index in the add-on's own tables. The visitor screens get diary cards, a
+ * side panel (streak, categories), a category filter and diary fields in the form.
+ * sirsoft-board and the visitor template are not modified, and no repository is rebound —
+ * everything goes through hooks, response middleware and layout filters.
  *
- * List / show / form screens, calendar, photos, memories and category management come in
- * later bundles.
+ * Calendar, photos, memories and category management come in later bundles.
  */
 class Plugin extends AbstractPlugin
 {
@@ -48,6 +55,8 @@ class Plugin extends AbstractPlugin
      * - DiarySaveListener: diary boards only — auto title, strips diary_* from the post data,
      *   writes the entry row and the photo index after save (sync).
      * - DiaryPurgeListener: removes diary rows of permanently deleted posts (sync).
+     * - DiaryListFilterListener: `diary_category` list filter and its count-cache axis.
+     * - DiaryLayoutListener: diary list branch, show info line and form fields (layout filter).
      *
      * @return array<int, class-string>
      */
@@ -58,6 +67,35 @@ class Plugin extends AbstractPlugin
             DiaryValidationListener::class,
             DiarySaveListener::class,
             DiaryPurgeListener::class,
+            DiaryListFilterListener::class,
+            DiaryLayoutListener::class,
+        ];
+    }
+
+    /**
+     * Middleware on sirsoft-board visitor routes (the core gate matches the route names).
+     *
+     * - DiaryListPageSize (before core): list page size from the setting, diary boards only.
+     * - DiaryResponseExtension (after core): diary data in the list / show / form responses
+     *   of diary boards; other boards' responses are not touched.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function getMiddleware(): array
+    {
+        return [
+            [
+                'class' => DiaryListPageSize::class,
+                'groups' => ['api'],
+                'timing' => 'before_core',
+                'targets' => [DiaryResponseExtension::ROUTE_INDEX],
+            ],
+            [
+                'class' => DiaryResponseExtension::class,
+                'groups' => ['api'],
+                'timing' => 'after_core',
+                'targets' => DiaryResponseExtension::TARGETS,
+            ],
         ];
     }
 
@@ -82,59 +120,7 @@ class Plugin extends AbstractPlugin
      */
     public function getSettingsSchema(): array
     {
-        return [
-            'weather_options' => [
-                'type' => 'array',
-                'default' => DiarySettings::DEFAULTS['weather_options'],
-                'label' => ['ko' => '날씨 목록', 'en' => 'Weather Options'],
-                'hint' => ['ko' => '항목마다 고정 키(영문 소문자)·이모지·표시 이름을 둡니다. 키는 저장값이라 바꾸지 않습니다.', 'en' => 'Each item has a fixed lowercase key, an emoji and a label. Keys are stored values; do not change them.'],
-                'required' => false,
-            ],
-            'auto_title_length' => [
-                'type' => 'integer',
-                'min' => 5,
-                'max' => 100,
-                'default' => DiarySettings::DEFAULTS['auto_title_length'],
-                'label' => ['ko' => '자동 제목 길이', 'en' => 'Auto Title Length'],
-                'required' => false,
-            ],
-            'photo_diary_title' => [
-                'type' => 'string',
-                'max' => 100,
-                'default' => DiarySettings::DEFAULTS['photo_diary_title'],
-                'label' => ['ko' => '사진 일기 제목', 'en' => 'Photo Diary Title'],
-                'required' => false,
-            ],
-            'memories_empty_text' => [
-                'type' => 'string',
-                'max' => 100,
-                'default' => DiarySettings::DEFAULTS['memories_empty_text'],
-                'label' => ['ko' => '지난 일기 부족 문구', 'en' => 'Not Enough Memories Text'],
-                'required' => false,
-            ],
-            'list_display_mode' => [
-                'type' => 'enum',
-                'options' => DiarySettings::MODES,
-                'default' => DiarySettings::DEFAULTS['list_display_mode'],
-                'label' => ['ko' => '목록 표시 방식', 'en' => 'List Display Mode'],
-                'required' => false,
-            ],
-            'photo_display_mode' => [
-                'type' => 'enum',
-                'options' => DiarySettings::MODES,
-                'default' => DiarySettings::DEFAULTS['photo_display_mode'],
-                'label' => ['ko' => '사진 표시 방식', 'en' => 'Photo Display Mode'],
-                'required' => false,
-            ],
-            'photo_page_size' => [
-                'type' => 'integer',
-                'min' => 6,
-                'max' => 120,
-                'default' => DiarySettings::DEFAULTS['photo_page_size'],
-                'label' => ['ko' => '사진 한 번에', 'en' => 'Photos Per Load'],
-                'required' => false,
-            ],
-        ];
+        return DiarySettingsSchema::all();
     }
 
     /**

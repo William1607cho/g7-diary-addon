@@ -1,0 +1,36 @@
+{
+  "id": "g7da_list_branch",
+  "comment": "g7-diary-addon: diary list branch (D17, template not modified). Rendered only for diary boards; inserted next to the basic fallback branch, whose condition excludes diary.",
+  "type": "basic",
+  "name": "Div",
+  "if": "{{posts?.data?.board?.type === 'diary'}}",
+  "props": {
+    "className": "g7da-list",
+    "data-g7da": "list"
+  },
+  "lifecycle": {
+    "onMount": [
+      {
+        "handler": "apiCall",
+        "auth_mode": "optional",
+        "target": "/api/plugins/g7-diary-addon/boards/{{route.slug}}/summary",
+        "params": { "method": "GET" },
+        "onSuccess": [
+          {
+            "handler": "setState",
+            "params": { "target": "local", "g7daSummary": "{{response.data}}" }
+          }
+        ]
+      }
+    ]
+  },
+  "children": [
+    { "g7da_include": "index/header" },
+    { "g7da_include": "index/search" },
+    { "g7da_include": "index/mobile-categories" },
+    { "g7da_include": "index/cards" },
+    { "g7da_include": "index/empty" },
+    { "g7da_include": "index/pager" },
+    { "g7da_include": "index/panel" }
+  ]
+}

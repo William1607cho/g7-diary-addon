@@ -36,9 +36,13 @@ class DiarySettings
         'photo_diary_title' => '(사진 일기)',
         'memories_empty_text' => '힘내서 일기 좀 더 써 주세요',
         'list_display_mode' => self::MODE_PAGINATE,
+        'list_page_size' => 0,
         'photo_display_mode' => self::MODE_INFINITE,
         'photo_page_size' => 30,
     ];
+
+    /** Posts per list load; 0 = the board's own list size. */
+    private const LIST_PAGE_MAX = 100;
 
     private const AUTO_TITLE_MIN = 5;
 
@@ -76,6 +80,7 @@ class DiarySettings
             'photo_diary_title' => self::text($raw['photo_diary_title'] ?? null, $d['photo_diary_title']),
             'memories_empty_text' => self::text($raw['memories_empty_text'] ?? null, $d['memories_empty_text']),
             'list_display_mode' => self::mode($raw['list_display_mode'] ?? null, $d['list_display_mode']),
+            'list_page_size' => self::intIn($raw['list_page_size'] ?? null, 0, self::LIST_PAGE_MAX, $d['list_page_size']),
             'photo_display_mode' => self::mode($raw['photo_display_mode'] ?? null, $d['photo_display_mode']),
             'photo_page_size' => self::intIn($raw['photo_page_size'] ?? null, self::PHOTO_PAGE_MIN, self::PHOTO_PAGE_MAX, $d['photo_page_size']),
         ];

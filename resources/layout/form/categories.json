@@ -1,0 +1,60 @@
+{
+  "comment": "Category boxes, 7 per row: big emoji, name below (narrow screens: emoji only). Chosen = category colour background + orange border; pressing it again clears it (the default category is used).",
+  "type": "basic",
+  "name": "Div",
+  "props": { "className": "g7da-fcats-wrap" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": {
+        "className": "g7da-fcats",
+        "role": "group",
+        "aria-label": "$t:g7-diary-addon.categories"
+      },
+      "iteration": { "source": "{{form_meta?.data?.diary?.categories ?? []}}", "item_var": "cat" },
+      "children": [
+        {
+          "type": "basic",
+          "name": "Button",
+          "props": {
+            "type": "button",
+            "className": "{{'g7da-fcat' + (_local.form?.diary_category_id == cat.id ? ' is-on' : '')}}",
+            "style": { "backgroundColor": "{{_local.form?.diary_category_id == cat.id ? cat.color + '33' : ''}}" },
+            "aria-pressed": "{{_local.form?.diary_category_id == cat.id ? 'true' : 'false'}}",
+            "aria-label": "{{cat.name}}",
+            "data-g7da-tip": "{{cat.name}}"
+          },
+          "actions": [
+            {
+              "type": "click",
+              "handler": "setState",
+              "params": {
+                "target": "local",
+                "form": { "diary_category_id": "{{_local.form?.diary_category_id == cat.id ? null : cat.id}}" },
+                "hasChanges": true
+              }
+            }
+          ],
+          "children": [
+            { "type": "basic", "name": "Span", "props": { "className": "g7da-fcat-emoji", "aria-hidden": "true" }, "text": "{{cat.emoji}}" },
+            { "type": "basic", "name": "Span", "props": { "className": "g7da-fcat-name", "aria-hidden": "true" }, "text": "{{cat.name}}" }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "P",
+      "props": { "className": "g7da-hint" },
+      "text": "$t:g7-diary-addon.category_hint|name={{form_meta?.data?.diary?.default_category?.name ?? ''}}"
+    },
+    {
+      "type": "basic",
+      "name": "P",
+      "if": "{{_local.errors?.diary_category_id || _local.errors?.diary_weather}}",
+      "props": { "className": "g7da-error" },
+      "text": "{{_local.errors?.diary_category_id?.[0] ?? _local.errors?.diary_weather?.[0] ?? ''}}"
+    }
+  ]
+}

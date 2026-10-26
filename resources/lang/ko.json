@@ -1,0 +1,22 @@
+{
+  "search": "검색",
+  "write": "글쓰기",
+  "panel_open": "일기 패널 열기",
+  "panel_close": "일기 패널 닫기",
+  "categories": "분류",
+  "category_filter": "분류로 보기",
+  "streak_current": "{{count}}일째 작성 중",
+  "streak_longest": "최장 기록 {{count}}일",
+  "secret": "비밀글",
+  "pinned": "고정",
+  "comments": "댓글 {{count}}",
+  "more": "더 보기",
+  "loading": "불러오는 중…",
+  "empty": "아직 쓴 일기가 없습니다.",
+  "empty_filtered": "이 조건에 맞는 일기가 없습니다.",
+  "diary_date": "일기 날짜",
+  "weather": "날씨",
+  "category_hint": "고르지 않으면 {{name}}",
+  "title_placeholder": "비워 두면 본문 첫 줄로 자동 생성됩니다",
+  "deleted": "삭제됨"
+}

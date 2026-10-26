@@ -1,0 +1,45 @@
+{
+  "comment": "Top row: board name (no description) + icon buttons. Bundle 3 icons (calendar, photos, memories) have their slot here but are not shown yet.",
+  "type": "basic",
+  "name": "Div",
+  "props": { "className": "g7da-head" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "H1",
+      "props": { "className": "g7da-title" },
+      "text": "{{posts?.data?.board?.name ?? ''}}"
+    },
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-icons" },
+      "children": [
+        { "g7da_slot": "bundle3_icons" },
+        {
+          "type": "basic",
+          "name": "Button",
+          "props": {
+            "type": "button",
+            "className": "{{'g7da-icon-btn' + ((_local.g7daSearchOpen || query.search) ? ' is-on' : '')}}",
+            "aria-label": "$t:g7-diary-addon.search",
+            "aria-expanded": "{{(_local.g7daSearchOpen || query.search) ? 'true' : 'false'}}",
+            "data-g7da-tip": "$t:g7-diary-addon.search",
+            "data-testid": "g7da-search-toggle"
+          },
+          "actions": [
+            {
+              "type": "click",
+              "handler": "setState",
+              "params": { "target": "local", "g7daSearchOpen": "{{!(_local.g7daSearchOpen || query.search)}}" }
+            }
+          ],
+          "children": [
+            { "type": "basic", "name": "Icon", "props": { "name": "search", "aria-hidden": "true" } }
+          ]
+        },
+        { "g7da_include": "index/write-button" }
+      ]
+    }
+  ]
+}
