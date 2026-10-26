@@ -40,7 +40,8 @@
 .g7da-card:focus-within { outline: 2px solid var(--g7da-accent); outline-offset: 2px; }
 .g7da-chip { display: inline-flex; align-items: center; gap: .25rem; padding: .125rem .5rem; border-radius: 9999px; font-weight: 600; color: var(--g7da-text); }
 /* card head line = the card link (D65). Wide: one line at 1.5x of the old head size (.8125rem -> 1.21875rem). */
-.g7da-card-link { display: flex; align-items: center; gap: .5rem; width: 100%; padding: 0; border: 0; background: none; text-align: left; font-size: 1.21875rem; line-height: 1.75rem; color: var(--g7da-text); cursor: pointer; }
+/* `button.` raises specificity over the template Button's base classes (inline-flex items-center justify-center) */
+button.g7da-card-link { display: flex; align-items: center; justify-content: flex-start; gap: .5rem; width: 100%; padding: 0; border: 0; background: none; text-align: left; font-size: 1.21875rem; line-height: 1.75rem; color: var(--g7da-text); cursor: pointer; }
 .g7da-card-link::after { content: ""; position: absolute; inset: 0; border-radius: .75rem; }
 .g7da-card-link:focus-visible { outline: none; }
 .g7da-card-link > * { position: relative; z-index: 1; flex: none; }
@@ -161,7 +162,7 @@
   .g7da-fcat-emoji { font-size: 1.25rem; }
   .g7da-card { padding: .875rem 1rem; }
   /* D65 narrow: line 1 = emoji, date, weather, flags (old head size); line 2 = title at 1.5x */
-  .g7da-card-link { flex-wrap: wrap; row-gap: .25rem; font-size: .8125rem; line-height: 1.25rem; }
+  button.g7da-card-link { flex-wrap: wrap; row-gap: .25rem; font-size: .8125rem; line-height: 1.25rem; }
   .g7da-cat, .g7da-weather { font-size: 1rem; }
   .g7da-flags { order: 4; }
   .g7da-title-wrap { order: 5; flex-basis: 100%; font-size: 1.21875rem; line-height: 1.75rem; }
