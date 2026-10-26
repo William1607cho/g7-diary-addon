@@ -108,12 +108,13 @@
 /* D69: equal fixed squares (3 equal columns + aspect-ratio), emoji row + a name area that is always two lines high,
    centred; line breaks only at spaces (keep-all); the count badge sits on the top-right corner, clear of the emoji. */
 .g7da-pcats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .625rem; padding-top: .25rem; }
-.g7da-pcat { position: relative; min-width: 0; aspect-ratio: 1 / 1; display: grid; grid-template-rows: 1fr auto; justify-items: center; align-items: end; padding: .375rem .25rem .3125rem; border-radius: .5rem; border: 2px solid transparent; color: var(--g7da-text); cursor: pointer; }
+.g7da-pcat { position: relative; min-width: 0; min-height: 0; aspect-ratio: 1 / 1; display: grid; grid-template-rows: 1fr auto; justify-items: center; align-items: end; padding: .25rem 0 .1875rem; border-radius: .5rem; border: 2px solid transparent; color: var(--g7da-text); cursor: pointer; }
 .g7da-pcat--all { background: #f3f4f6; }
 .dark .g7da-pcat--all { background: #374151; }
 .g7da-pcat.is-on { border-color: var(--g7da-accent); }
-.g7da-pcat-emoji { font-size: 1.375rem; line-height: 1.5rem; }
-.g7da-pcat-name { display: flex; align-items: center; justify-content: center; width: 100%; height: 1.5rem; margin-top: .125rem; font-size: .625rem; line-height: .75rem; text-align: center; word-break: keep-all; overflow-wrap: normal; overflow: hidden; }
+.g7da-pcat-emoji { font-size: 1.25rem; line-height: 1.25rem; }
+/* name area: two lines (2 x .6875rem) always reserved, centred; content 4 + 20 + 2 + 22 + 3 + border 4 = 55px < box ~57px */
+.g7da-pcat-name { display: flex; align-items: center; justify-content: center; width: 100%; height: 1.375rem; margin-top: .125rem; font-size: .625rem; line-height: .6875rem; letter-spacing: -.02em; text-align: center; word-break: keep-all; overflow-wrap: normal; overflow: hidden; }
 .g7da-pcat-count { position: absolute; top: 0; right: 0; transform: translate(40%, -40%); min-width: 1.125rem; padding: 0 .25rem; border-radius: 9999px; background: #374151; color: #fff; font-size: .625rem; line-height: 1rem; font-weight: 700; text-align: center; }
 .dark .g7da-pcat-count { background: #e5e7eb; color: #111827; }
 

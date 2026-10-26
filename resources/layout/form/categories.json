@@ -38,7 +38,7 @@
           ],
           "children": [
             { "type": "basic", "name": "Span", "props": { "className": "g7da-fcat-emoji", "aria-hidden": "true" }, "text": "{{cat.emoji}}" },
-            { "type": "basic", "name": "Span", "props": { "className": "g7da-fcat-name", "aria-hidden": "true" }, "text": "{{cat.name}}" }
+            { "type": "basic", "name": "Span", "props": { "className": "g7da-fcat-name", "aria-hidden": "true" }, "text": "{{cat.label ?? cat.name}}" }
           ]
         }
       ]

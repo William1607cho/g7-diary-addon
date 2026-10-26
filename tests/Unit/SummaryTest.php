@@ -130,11 +130,21 @@ class SummaryTest extends TestCase
         $this->assertSame('2026-10-21', $locked['date']);
     }
 
+    public function test_box_label_never_leaves_one_character_alone_on_a_line(): void
+    {
+        $nb = "\u{00A0}";
+        $this->assertSame("개빡치는{$nb}날", DiaryMeta::label('개빡치는 날'));     // last word one char
+        $this->assertSame("새{$nb}일기 모음", DiaryMeta::label('새 일기 모음'));   // first word one char
+        $this->assertSame('스페샬 이벤트', DiaryMeta::label('스페샬 이벤트'));      // normal break kept
+        $this->assertSame('평온한 하루', DiaryMeta::label(' 평온한  하루 '));
+        $this->assertSame('분노일기', DiaryMeta::label('분노일기'));
+    }
+
     public function test_category_public_shape_and_colour_guard(): void
     {
         $c = DiaryMeta::category(['id' => '2', 'name' => ['ko' => '우울일기'], 'icon_type' => 'emoji', 'icon_value' => '😢', 'color' => 'red;background:url(x)', 'is_default' => 0]);
 
-        $this->assertSame(['id' => 2, 'emoji' => '😢', 'name' => '우울일기', 'color' => '#9CA3AF', 'is_default' => false], $c);
+        $this->assertSame(['id' => 2, 'emoji' => '😢', 'name' => '우울일기', 'label' => '우울일기', 'color' => '#9CA3AF', 'is_default' => false], $c);
         $this->assertSame('#3B82F6', DiaryMeta::color('#3b82f6'));
     }
 }

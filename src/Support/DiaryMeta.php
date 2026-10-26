@@ -63,9 +63,31 @@ final class DiaryMeta
             'id' => (int) $row['id'],
             'emoji' => ($row['icon_type'] ?? 'emoji') === 'emoji' ? (string) ($row['icon_value'] ?? '') : '',
             'name' => (string) $name,
+            'label' => self::label((string) $name),
             'color' => self::color((string) ($row['color'] ?? '')),
             'is_default' => (bool) ($row['is_default'] ?? false),
         ];
+    }
+
+    /**
+     * Name for small boxes (D70): lines may break only at spaces, and a one-character word
+     * must not end up alone on a line — the space next to a one-character first or last word
+     * becomes a no-break space, so "개빡치는 날" stays on one line instead of leaving "날".
+     */
+    public static function label(string $name): string
+    {
+        $words = preg_split('/ +/u', trim($name)) ?: [];
+        $n = count($words);
+        if ($n < 2) {
+            return trim($name);
+        }
+        $out = $words[0];
+        for ($i = 1; $i < $n; $i++) {
+            $glue = (Graphemes::length($words[$i - 1]) === 1 && $i === 1) || (Graphemes::length($words[$i]) === 1 && $i === $n - 1) ? "\u{00A0}" : ' ';
+            $out .= $glue.$words[$i];
+        }
+
+        return $out;
     }
 
     /**

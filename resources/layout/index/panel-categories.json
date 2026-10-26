@@ -50,7 +50,7 @@
       ],
       "children": [
         { "type": "basic", "name": "Span", "props": { "className": "g7da-pcat-emoji", "aria-hidden": "true" }, "text": "{{cat.emoji}}" },
-        { "type": "basic", "name": "Span", "props": { "className": "g7da-pcat-name", "aria-hidden": "true" }, "text": "{{cat.name}}" },
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-pcat-name", "aria-hidden": "true" }, "text": "{{cat.label ?? cat.name}}" },
         { "type": "basic", "name": "Span", "props": { "className": "g7da-pcat-count", "aria-hidden": "true" }, "text": "{{cat.count}}" }
       ]
     }
