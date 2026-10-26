@@ -58,10 +58,11 @@ button.g7da-card-link { display: flex; align-items: center; justify-content: fle
 .g7da-flags { display: inline-flex; align-items: center; gap: .5rem; margin-left: auto; font-size: .875rem; }
 .g7da-flags:empty { display: none; }
 .g7da-secret { display: inline-flex; align-items: center; color: var(--g7da-muted); }
-/* D71: bullhorn 24.5px (2 x the old fa-sm 12.25px) in a red rounded box (.5rem = icon buttons' rounded-lg),
-   28px high = the wide head line, so the line does not grow (narrow line 1 is 20px: negative block margin there). */
-.g7da-pin { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: 2.25rem; height: 1.75rem; border: 1.5px solid currentColor; border-radius: .5rem; color: #dc2626; }
-.g7da-pin i, .g7da-pin svg { font-size: 1.53125rem; line-height: 1; }
+/* D76: the forum-addon pin button shape (square 1:1, rounded-md .375rem corners, 1px border — forum
+   squareButtonClass h-10 w-10 rounded-md border) at 28px = the wide head line, so the line does not grow
+   (narrow line 1 is 20px: negative block margin there). Glyph 16px = the forum pin glyph. Red kept. */
+.g7da-pin { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: 1.75rem; height: 1.75rem; border: 1px solid currentColor; border-radius: .375rem; color: #dc2626; }
+.g7da-pin i, .g7da-pin svg { font-size: 1rem; line-height: 1; }
 .dark .g7da-pin { color: #f87171; }
 .g7da-deleted { color: #b91c1c; font-weight: 600; }
 .dark .g7da-deleted { color: #fca5a5; }
