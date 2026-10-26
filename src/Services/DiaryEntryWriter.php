@@ -3,8 +3,8 @@
 namespace Plugins\G7\Diary\Addon\Services;
 
 use Illuminate\Support\Facades\DB;
-use Modules\Sirsoft\Board\Models\Attachment;
 use Modules\Sirsoft\Board\Models\Post;
+use Plugins\G7\Diary\Addon\Support\BackfillStore;
 use Plugins\G7\Diary\Addon\Support\PhotoExtractor;
 use Plugins\G7\Diary\Addon\Support\SiteClock;
 
@@ -12,7 +12,9 @@ use Plugins\G7\Diary\Addon\Support\SiteClock;
  * Writes the diary meta row and the photo index of one post.
  *
  * Called from the after-create / after-update hooks (outside the post transaction),
- * so the post and its attachments are already committed.
+ * so the post and its attachments are already committed. Every save marks the row
+ * `origin = normal`, so a row made by the backfill command becomes the author's own once
+ * the post is edited (and `--undo` leaves it alone).
  */
 class DiaryEntryWriter
 {
@@ -20,6 +22,11 @@ class DiaryEntryWriter
     public const ENTRIES = 'g7_diary_addon_entries';
 
     public const PHOTOS = 'g7_diary_addon_photos';
+
+    /** `origin` of rows written by the save hook (the backfill writes BackfillPlan::ORIGIN). */
+    public const ORIGIN_NORMAL = 'normal';
+
+    public function __construct(private readonly BackfillStore $sources) {}
 
     /**
      * Inserts or updates the entry row, then rebuilds the photo index.
@@ -43,12 +50,13 @@ class DiaryEntryWriter
                     'weather' => $fields['weather'] ?? null,
                     'diary_date' => $diaryDate,
                     'title_auto' => $titleAuto ?? 0,
+                    'origin' => self::ORIGIN_NORMAL,
                     'created_at' => $now,
                     'updated_at' => $now,
                 ]);
             } else {
                 $diaryDate = $fields['diary_date'] ?? (string) $existing->diary_date;
-                $update = ['board_id' => (int) $post->board_id, 'diary_date' => $diaryDate, 'updated_at' => $now];
+                $update = ['board_id' => (int) $post->board_id, 'diary_date' => $diaryDate, 'origin' => self::ORIGIN_NORMAL, 'updated_at' => $now];
                 if (array_key_exists('category_id', $fields)) {
                     $update['category_id'] = $fields['category_id'];
                 }
@@ -89,15 +97,8 @@ class DiaryEntryWriter
         $postId = (int) $post->id;
         $hashes = PhotoExtractor::editorHashes((string) $post->content);
 
-        $attachmentIds = Attachment::query()
-            ->where('post_id', $postId)
-            ->orderBy('order')
-            ->orderBy('id')
-            ->get(['id', 'mime_type'])
-            ->filter(static fn (Attachment $a): bool => $a->is_image)
-            ->map(static fn (Attachment $a): int => (int) $a->id)
-            ->values()
-            ->all();
+        // Image attachments in display order — one rule for the save hook and the backfill (D31).
+        $attachmentIds = $this->sources->imageAttachments([$postId])[$postId] ?? [];
 
         DB::table(self::PHOTOS)->where('post_id', $postId)->delete();
 
