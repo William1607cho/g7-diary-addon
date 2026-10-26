@@ -2,6 +2,7 @@
 
 namespace Plugins\G7\Diary\Addon\Services;
 
+use Plugins\G7\Diary\Addon\Support\CategoryCounts;
 use Plugins\G7\Diary\Addon\Support\CategoryRules;
 use Plugins\G7\Diary\Addon\Support\CategoryStore;
 
@@ -19,19 +20,21 @@ class CategoryAdmin
     public function __construct(private readonly CategoryStore $store) {}
 
     /**
-     * Rows for the admin screen: a stable `uid` for the sortable list and the number of
-     * posts that carry the category (for the delete dialog). Posts without a category count
-     * for the default one in the screens, but the dialog speaks of the category's own posts.
+     * Rows for the admin screen: a stable `uid` for the sortable list and the post count
+     * the visitor panel shows to a board manager (D115): every live post of the diary
+     * boards, secret ones included; the default category also holds the posts without a
+     * category and those of deleted categories.
      *
      * @return array<int, array<string, mixed>>
      */
     public function rows(): array
     {
-        $counts = $this->store->postsPerCategory();
+        $rows = $this->store->activeRows();
+        $counts = CategoryCounts::fromTotals($this->store->postsPerCategory(), $rows);
 
         return array_map(static fn (array $r): array => ['uid' => 'c'.$r['id']] + $r + [
             'posts' => $counts[$r['id']] ?? 0,
-        ], $this->store->activeRows());
+        ], $rows);
     }
 
     /**

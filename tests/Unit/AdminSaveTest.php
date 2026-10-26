@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Plugins\G7\Diary\Addon\Layout\Fragments;
 use Plugins\G7\Diary\Addon\Layout\ScreenInjector;
 use Plugins\G7\Diary\Addon\Services\CategoryAdmin;
+use Plugins\G7\Diary\Addon\Support\CategoryCounts;
 use Plugins\G7\Diary\Addon\Support\CategoryStore;
 use Plugins\G7\Diary\Addon\Support\DiaryCategoryFilter;
 use Plugins\G7\Diary\Addon\Support\WeatherKeys;
@@ -33,7 +34,20 @@ class AdminSaveTest extends TestCase
         $this->assertTrue($store->rows[1]['is_default']);
         $this->assertSame('c8', $r['rows'][2]['uid']);
         $this->assertSame(2, $r['rows'][0]['posts']);
+        // D115: the default (now 1) also holds posts without a category (0) and of deleted ids (2 now, 99).
+        $this->assertSame(5 + 4 + 3 + 1, $r['rows'][1]['posts']);
+        $this->assertSame(0, $r['rows'][2]['posts']);
         $this->assertSame(1, $store->transactions);
+    }
+
+    public function test_admin_counts_follow_the_panel_rule(): void
+    {
+        $cats = [['id' => 1, 'is_default' => false], ['id' => 4, 'is_default' => true], ['id' => 7, 'is_default' => false]];
+        $this->assertSame([1 => 6, 4 => 2 + 7 + 3, 7 => 0], CategoryCounts::fromTotals([1 => 6, 4 => 2, 0 => 7, 99 => 3], $cats));
+        // Same numbers as the per-post panel count of the same posts.
+        $posts = array_merge(array_fill(0, 6, 1), array_fill(0, 2, 4), array_fill(0, 7, null), array_fill(0, 3, 99));
+        $panel = array_column(CategoryCounts::count($posts, $cats), 'count', 'id');
+        $this->assertSame($panel, CategoryCounts::fromTotals([1 => 6, 4 => 2, 0 => 7, 99 => 3], $cats));
     }
 
     public function test_a_failure_inside_the_transaction_rolls_everything_back(): void
@@ -189,7 +203,7 @@ class FakeCategoryStore implements CategoryStore
 
     public function postsPerCategory(): array
     {
-        return [3 => 2, 1 => 5];
+        return [3 => 2, 1 => 5, 2 => 3, 0 => 4, 99 => 1];
     }
 
     public function postsPerWeather(): array

@@ -70,27 +70,36 @@ class DbCategoryStore implements CategoryStore
 
     public function postsPerCategory(): array
     {
-        return $this->perColumn('category_id');
+        // Same base as the visitor panel (DiaryPostReader::summaryRows): live posts with or
+        // without an entry row, here over every diary board.
+        $entries = DiaryPostReader::ENTRIES;
+        $out = [];
+        $rows = DB::table('board_posts')
+            ->join('boards', 'boards.id', '=', 'board_posts.board_id')
+            ->leftJoin($entries, $entries.'.post_id', '=', 'board_posts.id')
+            ->where('boards.type', DiaryBoards::TYPE)
+            ->whereNull('board_posts.deleted_at')
+            ->groupBy($entries.'.category_id')
+            ->select($entries.'.category_id as v')->selectRaw('COUNT(*) as n')
+            ->get();
+        foreach ($rows as $row) {
+            $id = $row->v === null ? 0 : (int) $row->v;
+            $out[$id] = ($out[$id] ?? 0) + (int) $row->n;
+        }
+
+        return $out;
     }
 
     public function postsPerWeather(): array
-    {
-        return $this->perColumn('weather');
-    }
-
-    /**
-     * @return array<int|string, int>
-     */
-    private function perColumn(string $column): array
     {
         $entries = DiaryPostReader::ENTRIES;
 
         return DB::table($entries)
             ->join('board_posts', 'board_posts.id', '=', $entries.'.post_id')
             ->whereNull('board_posts.deleted_at')
-            ->whereNotNull($entries.'.'.$column)
-            ->groupBy($entries.'.'.$column)
-            ->select($entries.'.'.$column.' as v')->selectRaw('COUNT(*) as n')
+            ->whereNotNull($entries.'.weather')
+            ->groupBy($entries.'.weather')
+            ->select($entries.'.weather as v')->selectRaw('COUNT(*) as n')
             ->pluck('n', 'v')->map(static fn ($n): int => (int) $n)->all();
     }
 }

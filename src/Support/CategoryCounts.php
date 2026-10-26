@@ -43,6 +43,32 @@ final class CategoryCounts
     }
 
     /**
+     * The same rule from totals per stored category id (admin screen, D115): `0` = no
+     * category or no entry row; ids that are not active (deleted, unknown) and `0` go to
+     * the default category.
+     *
+     * @param  array<int, int>  $totals  Stored category id (0 = none) => posts.
+     * @param  array<int, array<string, mixed>>  $categories  Active categories in order (with `id`, `is_default`).
+     * @return array<int, int> Active id => posts.
+     */
+    public static function fromTotals(array $totals, array $categories): array
+    {
+        $defaultId = self::defaultId($categories);
+        $out = [];
+        foreach ($categories as $c) {
+            $out[(int) $c['id']] = 0;
+        }
+        foreach ($totals as $id => $n) {
+            $key = isset($out[(int) $id]) ? (int) $id : $defaultId;
+            if ($key !== null) {
+                $out[$key] += (int) $n;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
      * Id of the default category (the first flagged one; else the first active one).
      *
      * @param  array<int, array<string, mixed>>  $categories

@@ -71,9 +71,14 @@
       "name": "Label",
       "props": { "className": "g7da-adm-c-default g7da-adm-radio" },
       "children": [
-        { "type": "basic", "name": "Input", "props": { "type": "radio", "name": "g7da-default", "checked": "{{!!$item.is_default}}", "aria-label": "{{$t('g7-diary-addon.admin.default_for', {name: $item.name})}}", "data-testid": "{{'g7da-adm-cat-default-' + $item.uid}}" }, "actions": [{ "type": "change", "handler": "g7-diary-addon.admin", "params": { "op": "catDefault", "uid": "{{$item.uid}}" } }] },
-        { "type": "basic", "name": "Span", "props": { "className": "g7da-adm-posts" }, "text": "{{$t('g7-diary-addon.admin.posts', {count: $item.posts ?? 0})}}" }
+        { "type": "basic", "name": "Input", "props": { "type": "radio", "name": "g7da-default", "checked": "{{!!$item.is_default}}", "aria-label": "{{$t('g7-diary-addon.admin.default_for', {name: $item.name})}}", "data-testid": "{{'g7da-adm-cat-default-' + $item.uid}}" }, "actions": [{ "type": "change", "handler": "g7-diary-addon.admin", "params": { "op": "catDefault", "uid": "{{$item.uid}}" } }] }
       ]
+    },
+    {
+      "type": "basic",
+      "name": "Span",
+      "props": { "className": "g7da-adm-c-posts g7da-adm-posts", "data-testid": "{{'g7da-adm-cat-posts-' + $item.uid}}" },
+      "text": "{{$t('g7-diary-addon.admin.posts', {count: $item.posts ?? 0})}}"
     },
     {
       "type": "basic",

@@ -41,7 +41,8 @@ interface CategoryStore
     public function softDelete(array $ids): void;
 
     /**
-     * Live diary posts per stored category id (null = no category).
+     * Live posts of the diary boards per stored category id; 0 = no category or no entry
+     * row (the visitor panel's base, secret posts included).
      *
      * @return array<int, int>
      */

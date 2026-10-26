@@ -6,6 +6,7 @@
   "props": { "className": "g7da-adm-panel", "role": "tabpanel", "id": "g7da-adm-panel-cats", "aria-labelledby": "g7da-adm-tab-cats", "data-testid": "g7da-adm-panel-cats" },
   "children": [
     { "type": "basic", "name": "P", "props": { "className": "g7da-adm-help" }, "text": "$t:g7-diary-addon.admin.cats_help" },
+    { "type": "basic", "name": "P", "props": { "className": "g7da-adm-help g7da-adm-help-strong", "data-testid": "g7da-adm-default-help" }, "text": "$t:g7-diary-addon.admin.default_help" },
     {
       "type": "basic",
       "name": "Div",
@@ -16,6 +17,7 @@
         { "type": "basic", "name": "Span", "props": { "className": "g7da-adm-c-name" }, "text": "$t:g7-diary-addon.admin.col_name" },
         { "type": "basic", "name": "Span", "props": { "className": "g7da-adm-c-color" }, "text": "$t:g7-diary-addon.admin.col_color" },
         { "type": "basic", "name": "Span", "props": { "className": "g7da-adm-c-default" }, "text": "$t:g7-diary-addon.admin.col_default" },
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-adm-c-posts" }, "text": "$t:g7-diary-addon.admin.col_posts" },
         { "type": "basic", "name": "Span", "props": { "className": "g7da-adm-c-del" }, "text": "$t:g7-diary-addon.admin.col_delete" }
       ]
     },
