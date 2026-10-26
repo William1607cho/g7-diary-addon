@@ -50,19 +50,30 @@ button.g7da-card-link { display: flex; align-items: center; justify-content: fle
 .g7da-title-wrap { flex: 1 1 auto; min-width: 0; }
 .g7da-title-text { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
 .g7da-title-wrap[data-g7da-tip]:hover::after { left: 0; transform: none; white-space: normal; width: max-content; max-width: 32rem; }
+/* D73: no card title / category emoji tooltips where nothing can hover (touch); the title tip is set by the
+   plugin script only while the title is actually cut. Icon button tooltips stay. */
+@media (hover: none) {
+  .g7da-card-link .g7da-cat[data-g7da-tip]::after, .g7da-card-link .g7da-title-wrap[data-g7da-tip]::after { display: none !important; }
+}
 .g7da-flags { display: inline-flex; align-items: center; gap: .5rem; margin-left: auto; font-size: .875rem; }
 .g7da-flags:empty { display: none; }
 .g7da-secret { display: inline-flex; align-items: center; color: var(--g7da-muted); }
-.g7da-pin { display: inline-flex; align-items: center; color: #dc2626; }
+/* D71: bullhorn 24.5px (2 x the old fa-sm 12.25px) in a red rounded box (.5rem = icon buttons' rounded-lg),
+   28px high = the wide head line, so the line does not grow (narrow line 1 is 20px: negative block margin there). */
+.g7da-pin { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: 2.25rem; height: 1.75rem; border: 1.5px solid currentColor; border-radius: .5rem; color: #dc2626; }
+.g7da-pin i, .g7da-pin svg { font-size: 1.53125rem; line-height: 1; }
 .dark .g7da-pin { color: #f87171; }
 .g7da-deleted { color: #b91c1c; font-weight: 600; }
 .dark .g7da-deleted { color: #fca5a5; }
 .g7da-card-foot { display: flex; justify-content: flex-end; margin-top: .5rem; font-size: .8125rem; color: var(--g7da-muted); }
 .g7da-comments { display: inline-flex; align-items: center; gap: .25rem; }
 
-/* preview — about 6 lines; the fade shows only when the text is cut (server flag or measured) */
+/* body block = preview (about 6 lines) + photo row; one fade at its bottom only when there is more to see (D72):
+   text cut (server is-more-text / measured g7da-overflow) or a +N on the photo row (wide: >4, narrow: >3) */
+.g7da-body { position: relative; }
+.g7da-body::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; display: none; height: 2.5rem; background: linear-gradient(to bottom, transparent, var(--g7da-card)); pointer-events: none; }
+.g7da-body.is-more-text::after, .g7da-body.is-more-wide::after, .g7da-body.g7da-overflow::after { display: block; }
 .g7da-preview { position: relative; margin-top: .375rem; max-height: 9.75rem; overflow: hidden; color: var(--g7da-text); pointer-events: none; }
-.g7da-preview.is-clipped::after, .g7da-preview.g7da-overflow::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2.5rem; background: linear-gradient(to bottom, transparent, var(--g7da-card)); pointer-events: none; }
 .g7da-preview-body { font-size: .9375rem; line-height: 1.625rem; max-width: none; }
 .g7da-preview-body p, .g7da-preview-body ul, .g7da-preview-body ol, .g7da-preview-body blockquote, .g7da-preview-body pre, .g7da-preview-body figure { margin: 0 0 .25rem; }
 .g7da-preview-body h1, .g7da-preview-body h2, .g7da-preview-body h3, .g7da-preview-body h4, .g7da-preview-body h5, .g7da-preview-body h6 { margin: 0 0 .25rem; font-size: 1em; font-weight: 700; }
@@ -78,7 +89,7 @@ button.g7da-card-link { display: flex; align-items: center; justify-content: fle
 .g7da-ph { position: relative; aspect-ratio: 1 / 1; overflow: hidden; border-radius: .5rem; background: #f3f4f6; }
 .dark .g7da-ph { background: #374151; }
 .g7da-ph img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.g7da-ph-more { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #000000a6; color: #fff; font-size: 1.25rem; font-weight: 700; }
+.g7da-ph-more { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; background: #000000a6; color: #fff; font-size: 1.25rem; font-weight: 700; }
 .g7da-ph-more--narrow { display: none; }
 
 /* empty + pager */
@@ -171,5 +182,8 @@ button.g7da-card-link { display: flex; align-items: center; justify-content: fle
   .g7da-ph:nth-child(n+4) { display: none; }
   .g7da-ph-more--wide { display: none; }
   .g7da-ph-more--narrow { display: flex; }
+  .g7da-body.is-more-wide::after { display: none; }
+  .g7da-body.is-more-text::after, .g7da-body.is-more-narrow::after, .g7da-body.g7da-overflow::after { display: block; }
+  .g7da-pin { margin-block: -.25rem; }
 }
 @media (prefers-reduced-motion: reduce) { .g7da-panel { transition: none; } }

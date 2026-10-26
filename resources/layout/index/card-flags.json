@@ -1,5 +1,5 @@
 {
-  "comment": "Right end of the card head line: secret lock, pinned bullhorn (red, D66), deleted badge (manager 'show deleted'). Icons only, custom tooltip + aria-label.",
+  "comment": "Right end of the card head line: secret lock, pinned bullhorn (red, twice the old size in a red rounded box — D66 / D71), deleted badge (manager 'show deleted'). Icons only, custom tooltip + aria-label.",
   "type": "basic",
   "name": "Span",
   "props": { "className": "g7da-flags" },
@@ -29,7 +29,7 @@
         "data-g7da-tip": "$t:g7-diary-addon.pinned"
       },
       "children": [
-        { "type": "basic", "name": "Icon", "props": { "name": "bullhorn", "size": "sm", "aria-hidden": "true" } }
+        { "type": "basic", "name": "Icon", "props": { "name": "bullhorn", "aria-hidden": "true" } }
       ]
     },
     {

@@ -53,7 +53,7 @@
         {
           "type": "basic",
           "name": "Span",
-          "props": { "className": "g7da-title-wrap", "data-g7da-tip": "{{post?.title ?? ''}}" },
+          "props": { "className": "g7da-title-wrap", "data-g7da-full": "{{post?.title ?? ''}}" },
           "children": [
             { "type": "basic", "name": "Span", "props": { "className": "g7da-title-text" }, "text": "{{post?.title ?? ''}}" }
           ]
@@ -62,23 +62,34 @@
       ]
     },
     {
+      "comment": "Body block = text preview + photo row (D72). One fade at its bottom, only when there is more to see: the text was cut (is-more-text, or measured overflow), or the photo row has a +N (wide: more than 4 photos, narrow: more than 3 — CSS picks the class for the screen).",
       "type": "basic",
       "name": "Div",
-      "if": "{{post?.diary_preview_html}}",
-      "props": { "className": "{{'g7da-preview' + (post?.diary_preview_clipped ? ' is-clipped' : '')}}" },
+      "if": "{{post?.diary_preview_html || (post?.diary_photos ?? []).length > 0}}",
+      "props": {
+        "className": "{{'g7da-body' + (post?.diary_preview_clipped ? ' is-more-text' : '') + ((post?.diary_photo_count ?? 0) > 4 ? ' is-more-wide' : '') + ((post?.diary_photo_count ?? 0) > 3 ? ' is-more-narrow' : '')}}"
+      },
       "children": [
         {
-          "type": "composite",
-          "name": "HtmlContent",
-          "props": {
-            "content": "{{post?.diary_preview_html ?? ''}}",
-            "isHtml": true,
-            "className": "g7da-preview-body"
-          }
-        }
+          "type": "basic",
+          "name": "Div",
+          "if": "{{post?.diary_preview_html}}",
+          "props": { "className": "g7da-preview" },
+          "children": [
+            {
+              "type": "composite",
+              "name": "HtmlContent",
+              "props": {
+                "content": "{{post?.diary_preview_html ?? ''}}",
+                "isHtml": true,
+                "className": "g7da-preview-body"
+              }
+            }
+          ]
+        },
+        { "g7da_include": "index/card-photos" }
       ]
     },
-    { "g7da_include": "index/card-photos" },
     {
       "type": "basic",
       "name": "Div",

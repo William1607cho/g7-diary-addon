@@ -3,8 +3,9 @@
  *
  * 1. Infinite scroll: the "load more" button of a diary list (data-g7da-more="auto") is clicked when
  *    it comes into view. After a failed load the layout switches it to "manual" and it stays a button.
- * 2. Preview fade: a preview box whose content is taller than the box gets `g7da-overflow`
- *    (the server flag `is-clipped` covers text it cut itself; this covers long kept text and images).
+ * 2. Body fade: a card body block whose preview text is taller than the preview box gets `g7da-overflow`
+ *    (the server flag `is-more-text` covers text it cut itself; photo +N is a server class too).
+ * 3. Card title tooltip: set only while the title is cut, and not on devices without hover.
  * Does nothing on pages without diary nodes.
  */
 (function () {
@@ -38,15 +39,26 @@
     });
   }
 
+  // D72: the fade belongs to the card body block (preview + photo row); text that is longer than the
+  // preview box marks the block, so a long kept text fades too.
   function measurePreviews() {
     document.querySelectorAll('.g7da-preview').forEach(function (box) {
-      box.classList.toggle('g7da-overflow', box.scrollHeight > box.clientHeight + 1);
-      box.querySelectorAll('img').forEach(function (img) {
-        if (!img.complete && !img.__g7da) {
-          img.__g7da = true;
-          img.addEventListener('load', measurePreviews, { once: true });
-        }
-      });
+      var body = box.closest('.g7da-body') || box;
+      body.classList.toggle('g7da-overflow', box.scrollHeight > box.clientHeight + 1);
+    });
+  }
+
+  // D73: the card title tooltip only while the title is cut (… shown), never where nothing can hover.
+  var canHover = !window.matchMedia || window.matchMedia('(hover: hover)').matches;
+  function measureTitles() {
+    document.querySelectorAll('.g7da-title-wrap[data-g7da-full]').forEach(function (wrap) {
+      var text = wrap.querySelector('.g7da-title-text');
+      var cut = !!text && text.scrollWidth > text.clientWidth + 1;
+      if (canHover && cut) {
+        wrap.setAttribute('data-g7da-tip', wrap.getAttribute('data-g7da-full') || '');
+      } else {
+        wrap.removeAttribute('data-g7da-tip');
+      }
     });
   }
 
@@ -63,6 +75,7 @@
       }
       watchMoreButtons();
       measurePreviews();
+      measureTitles();
     });
   }
 
