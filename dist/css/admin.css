@@ -178,6 +178,7 @@
 .g7da-adm-direct { display: flex; flex-direction: column; gap: 0.375rem; margin-top: 0.875rem; }
 .g7da-adm-direct-row { display: flex; gap: 0.5rem; }
 .g7da-adm-direct-input { flex: 1 1 auto; min-width: 0; }
+.g7da-adm-applybtn { flex: 0 0 auto; white-space: nowrap; }
 .g7da-adm-dialog-text { margin: 0.75rem 0 0.5rem; font-size: 0.9375rem; }
 .g7da-adm-dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; }
 .g7da-adm-confirm { background: #b91c1c; border-color: #b91c1c; color: #ffffff; }

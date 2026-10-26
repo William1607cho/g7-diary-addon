@@ -126,7 +126,7 @@
     "delete_ok": "Delete",
     "err": {
       "emoji_single": "Exactly one emoji.",
-      "name_length": "Names are 1–20 characters (no double braces).",
+      "name_length": "Names are 1–20 characters.",
       "name_duplicate": "Another category has this name.",
       "color_hex": "Colours are # and six hex digits.",
       "categories_required": "Keep at least one category.",
@@ -137,7 +137,7 @@
       "range_list": "A number from 1 to 100, or empty.",
       "range_photo": "A number from 6 to 120.",
       "range_title": "A number from 5 to 100.",
-      "text_length": "1–100 characters (no double braces)."
+      "text_length": "1–100 characters."
     }
   }
 }

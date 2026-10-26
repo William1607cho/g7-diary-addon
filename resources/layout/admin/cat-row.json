@@ -13,9 +13,9 @@
       "name": "Div",
       "props": { "className": "g7da-adm-c-order" },
       "children": [
-        { "type": "basic", "name": "Button", "props": { "type": "button", "className": "g7da-adm-grip", "data-drag-handle": true, "aria-label": "$t:defer:g7-diary-addon.admin.drag_named|name={{$item.name}}", "data-g7da-tip": "{{$t('g7-diary-addon.admin.drag')}}" }, "children": [{ "type": "basic", "name": "Icon", "props": { "name": "grip-vertical", "aria-hidden": "true" } }] },
-        { "type": "basic", "name": "Button", "props": { "type": "button", "className": "g7da-adm-mini", "disabled": "{{$index === 0}}", "aria-label": "$t:defer:g7-diary-addon.admin.move_up_named|name={{$item.name}}", "data-g7da-tip": "{{$t('g7-diary-addon.admin.move_up')}}", "data-testid": "{{'g7da-adm-cat-up-' + $item.uid}}" }, "actions": [{ "type": "click", "handler": "g7-diary-addon.admin", "params": { "op": "catMove", "uid": "{{$item.uid}}", "dir": -1 } }], "children": [{ "type": "basic", "name": "Icon", "props": { "name": "chevron-up", "aria-hidden": "true" } }] },
-        { "type": "basic", "name": "Button", "props": { "type": "button", "className": "g7da-adm-mini", "disabled": "{{$index === (_local.g7da?.cats?.length ?? 1) - 1}}", "aria-label": "$t:defer:g7-diary-addon.admin.move_down_named|name={{$item.name}}", "data-g7da-tip": "{{$t('g7-diary-addon.admin.move_down')}}", "data-testid": "{{'g7da-adm-cat-down-' + $item.uid}}" }, "actions": [{ "type": "click", "handler": "g7-diary-addon.admin", "params": { "op": "catMove", "uid": "{{$item.uid}}", "dir": 1 } }], "children": [{ "type": "basic", "name": "Icon", "props": { "name": "chevron-down", "aria-hidden": "true" } }] }
+        { "type": "basic", "name": "Button", "props": { "type": "button", "className": "g7da-adm-grip", "data-drag-handle": true, "aria-label": "{{$t('g7-diary-addon.admin.drag_named', {name: $item.name})}}", "data-g7da-tip": "{{$t('g7-diary-addon.admin.drag')}}" }, "children": [{ "type": "basic", "name": "Icon", "props": { "name": "grip-vertical", "aria-hidden": "true" } }] },
+        { "type": "basic", "name": "Button", "props": { "type": "button", "className": "g7da-adm-mini", "disabled": "{{$index === 0}}", "aria-label": "{{$t('g7-diary-addon.admin.move_up_named', {name: $item.name})}}", "data-g7da-tip": "{{$t('g7-diary-addon.admin.move_up')}}", "data-testid": "{{'g7da-adm-cat-up-' + $item.uid}}" }, "actions": [{ "type": "click", "handler": "g7-diary-addon.admin", "params": { "op": "catMove", "uid": "{{$item.uid}}", "dir": -1 } }], "children": [{ "type": "basic", "name": "Icon", "props": { "name": "chevron-up", "aria-hidden": "true" } }] },
+        { "type": "basic", "name": "Button", "props": { "type": "button", "className": "g7da-adm-mini", "disabled": "{{$index === (_local.g7da?.cats?.length ?? 1) - 1}}", "aria-label": "{{$t('g7-diary-addon.admin.move_down_named', {name: $item.name})}}", "data-g7da-tip": "{{$t('g7-diary-addon.admin.move_down')}}", "data-testid": "{{'g7da-adm-cat-down-' + $item.uid}}" }, "actions": [{ "type": "click", "handler": "g7-diary-addon.admin", "params": { "op": "catMove", "uid": "{{$item.uid}}", "dir": 1 } }], "children": [{ "type": "basic", "name": "Icon", "props": { "name": "chevron-down", "aria-hidden": "true" } }] }
       ]
     },
     {
@@ -24,7 +24,7 @@
       "props": {
         "type": "button",
         "className": "{{'g7da-adm-emoji g7da-adm-c-emoji' + ($item.emoji ? '' : ' is-empty')}}",
-        "aria-label": "$t:defer:g7-diary-addon.admin.pick_emoji_for|name={{$item.name}}",
+        "aria-label": "{{$t('g7-diary-addon.admin.pick_emoji_for', {name: $item.name})}}",
         "aria-haspopup": "dialog",
         "data-g7da-tip": "{{$t('g7-diary-addon.admin.pick_emoji')}}",
         "data-g7da-opener": "{{'emoji:' + $item.uid}}",
@@ -56,7 +56,7 @@
         {
           "type": "basic",
           "name": "Button",
-          "props": { "type": "button", "className": "g7da-adm-colorbtn", "aria-haspopup": "dialog", "aria-label": "$t:defer:g7-diary-addon.admin.pick_color_for|name={{$item.name}}|color={{$item.color}}", "data-g7da-opener": "{{'color:' + $item.uid}}", "data-testid": "{{'g7da-adm-cat-color-' + $item.uid}}" },
+          "props": { "type": "button", "className": "g7da-adm-colorbtn", "aria-haspopup": "dialog", "aria-label": "{{$t('g7-diary-addon.admin.pick_color_for', {name: $item.name, color: $item.color})}}", "data-g7da-opener": "{{'color:' + $item.uid}}", "data-testid": "{{'g7da-adm-cat-color-' + $item.uid}}" },
           "actions": [{ "type": "click", "handler": "g7-diary-addon.admin", "params": { "op": "colorOpen", "uid": "{{$item.uid}}" } }],
           "children": [
             { "type": "basic", "name": "Span", "props": { "className": "g7da-adm-swatch", "style": { "backgroundColor": "{{$item.color}}" }, "aria-hidden": "true" } },
@@ -71,8 +71,8 @@
       "name": "Label",
       "props": { "className": "g7da-adm-c-default g7da-adm-radio" },
       "children": [
-        { "type": "basic", "name": "Input", "props": { "type": "radio", "name": "g7da-default", "checked": "{{!!$item.is_default}}", "aria-label": "$t:defer:g7-diary-addon.admin.default_for|name={{$item.name}}", "data-testid": "{{'g7da-adm-cat-default-' + $item.uid}}" }, "actions": [{ "type": "change", "handler": "g7-diary-addon.admin", "params": { "op": "catDefault", "uid": "{{$item.uid}}" } }] },
-        { "type": "basic", "name": "Span", "props": { "className": "g7da-adm-posts" }, "text": "$t:defer:g7-diary-addon.admin.posts|count={{$item.posts ?? 0}}" }
+        { "type": "basic", "name": "Input", "props": { "type": "radio", "name": "g7da-default", "checked": "{{!!$item.is_default}}", "aria-label": "{{$t('g7-diary-addon.admin.default_for', {name: $item.name})}}", "data-testid": "{{'g7da-adm-cat-default-' + $item.uid}}" }, "actions": [{ "type": "change", "handler": "g7-diary-addon.admin", "params": { "op": "catDefault", "uid": "{{$item.uid}}" } }] },
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-adm-posts" }, "text": "{{$t('g7-diary-addon.admin.posts', {count: $item.posts ?? 0})}}" }
       ]
     },
     {
@@ -82,7 +82,7 @@
         "type": "button",
         "className": "g7da-adm-del g7da-adm-c-del",
         "disabled": "{{!!$item.is_default || (_local.g7da?.cats?.length ?? 0) <= 1}}",
-        "aria-label": "$t:defer:g7-diary-addon.admin.delete_named|name={{$item.name}}",
+        "aria-label": "{{$t('g7-diary-addon.admin.delete_named', {name: $item.name})}}",
         "data-g7da-tip": "{{$item.is_default ? $t('g7-diary-addon.admin.delete_default_tip') : ((_local.g7da?.cats?.length ?? 0) <= 1 ? $t('g7-diary-addon.admin.delete_last_tip') : $t('g7-diary-addon.admin.delete'))}}",
         "data-testid": "{{'g7da-adm-cat-del-' + $item.uid}}"
       },

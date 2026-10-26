@@ -1,5 +1,5 @@
 {
-  "comment": "Display fields: list mode + per load (empty = the board's list size), photo mode + per load (6–120). Modes are radio pairs (keyboard: arrows inside the group).",
+  "comment": "Display fields: list mode + per load (empty = the board's list size), photo mode + per load (6–120). Modes are radio pairs in a radiogroup (keyboard: arrows inside the group). No Fieldset/Legend — the engine has no such basic components.",
   "type": "basic",
   "name": "Div",
   "props": { "className": "g7da-adm-fieldgroup" },
@@ -12,14 +12,14 @@
       "children": [
         {
           "type": "basic",
-          "name": "Fieldset",
+          "name": "Div",
           "props": { "className": "g7da-adm-field" },
           "children": [
-            { "type": "basic", "name": "Legend", "props": { "className": "g7da-adm-label" }, "text": "{{fd.t}}" },
+            { "type": "basic", "name": "P", "props": { "className": "g7da-adm-label", "id": "{{'g7da-lbl-' + fd.f}}" }, "text": "{{fd.t}}" },
             {
               "type": "basic",
               "name": "Div",
-              "props": { "className": "g7da-adm-seg" },
+              "props": { "className": "g7da-adm-seg", "role": "radiogroup", "aria-labelledby": "{{'g7da-lbl-' + fd.f}}" },
               "children": [
                 {
                   "type": "basic",
