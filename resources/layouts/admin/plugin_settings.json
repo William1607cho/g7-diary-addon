@@ -1,0 +1,36 @@
+{
+  "version": "1.0.0",
+  "layout_name": "plugin_settings",
+  "permissions": ["core.plugins.update"],
+  "extends": "_admin_base",
+  "meta": {
+    "title": "$t:g7-diary-addon.admin.title",
+    "description": "g7-diary-addon: admin settings screen 일기장 설정 (tabs: categories, weather, display and texts). The content node is filled by the add-on's layout listener from resources/layout/admin/*.json (D98). The screen state lives in _local.g7da and changes only through the g7-diary-addon.admin handler (dist/js/admin.js, loaded below with admin-state.js — admin screen only, D102)."
+  },
+  "scripts": [
+    { "src": "/api/plugins/assets/g7-diary-addon/dist/js/admin-state.js", "id": "g7da-admin-state" },
+    { "src": "/api/plugins/assets/g7-diary-addon/dist/js/admin.js", "id": "g7da-admin" }
+  ],
+  "data_sources": [
+    {
+      "id": "g7daAdmin",
+      "label_key": "$t:g7-diary-addon.admin.title",
+      "type": "api",
+      "endpoint": "/api/plugins/g7-diary-addon/admin/screen",
+      "method": "GET",
+      "auto_fetch": true,
+      "auth_required": true,
+      "refetchOnMount": true
+    }
+  ],
+  "slots": {
+    "content": [
+      {
+        "id": "g7da_admin_root",
+        "type": "basic",
+        "name": "Div",
+        "props": { "className": "admin-page-content-responsive g7da-adm", "data-g7da": "admin" }
+      }
+    ]
+  }
+}

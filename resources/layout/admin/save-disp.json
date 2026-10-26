@@ -1,0 +1,64 @@
+{
+  "comment": "Save bar of the [표시·문구] tab: only these keys go to the core plugin settings route (merge save). An empty per-load list size is sent as 0 (= the board's list size).",
+  "type": "basic",
+  "name": "Div",
+  "props": { "className": "g7da-adm-savebar" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-adm-status", "role": "status", "aria-live": "polite" },
+      "children": [
+        { "type": "basic", "name": "P", "if": "{{(_local.g7da?.serverErrors?.disp?.length ?? 0) > 0}}", "props": { "className": "g7da-adm-err", "role": "alert" }, "text": "{{(_local.g7da?.serverErrors?.disp ?? []).join(' · ')}}" },
+        { "type": "basic", "name": "P", "if": "{{_local.g7da?.dirty?.disp && _local.g7da?.valid?.disp}}", "props": { "className": "g7da-adm-note" }, "text": "$t:g7-diary-addon.admin.unsaved_note" }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Button",
+      "props": {
+        "type": "button",
+        "className": "btn btn-primary g7da-adm-save",
+        "disabled": "{{!_local.g7da?.dirty?.disp || !_local.g7da?.valid?.disp || !!_local.g7da?.busy}}",
+        "data-testid": "g7da-adm-save-disp"
+      },
+      "actions": [
+        {
+          "type": "click",
+          "handler": "sequence",
+          "actions": [
+            { "handler": "g7-diary-addon.admin", "params": { "op": "busy", "tab": "disp" } },
+            {
+              "handler": "apiCall",
+              "auth_required": true,
+              "target": "/api/admin/plugins/g7-diary-addon/settings",
+              "params": {
+                "method": "PUT",
+                "body": {
+                  "list_display_mode": "{{_local.g7da?.disp?.list_display_mode}}",
+                  "list_page_size": "{{_local.g7da?.disp?.list_page_size === '' ? 0 : Number(_local.g7da?.disp?.list_page_size)}}",
+                  "photo_display_mode": "{{_local.g7da?.disp?.photo_display_mode}}",
+                  "photo_page_size": "{{Number(_local.g7da?.disp?.photo_page_size)}}",
+                  "auto_title_length": "{{Number(_local.g7da?.disp?.auto_title_length)}}",
+                  "photo_diary_title": "{{String(_local.g7da?.disp?.photo_diary_title ?? '').trim()}}",
+                  "memories_empty_text": "{{String(_local.g7da?.disp?.memories_empty_text ?? '').trim()}}"
+                }
+              },
+              "onSuccess": [
+                { "handler": "g7-diary-addon.admin", "params": { "op": "saved", "tab": "disp", "data": "{{response.data}}" } },
+                { "handler": "toast", "params": { "type": "success", "message": "$t:g7-diary-addon.admin.saved" } }
+              ],
+              "onError": [
+                { "handler": "g7-diary-addon.admin", "params": { "op": "saveFailed", "tab": "disp", "errors": "{{error.errors}}" } },
+                { "handler": "toast", "params": { "type": "error", "message": "{{error.message ?? $t('g7-diary-addon.admin.save_error')}}" } }
+              ]
+            }
+          ]
+        }
+      ],
+      "children": [
+        { "type": "basic", "name": "Span", "text": "{{_local.g7da?.busy === 'disp' ? $t('g7-diary-addon.admin.saving') : $t('g7-diary-addon.admin.save')}}" }
+      ]
+    }
+  ]
+}

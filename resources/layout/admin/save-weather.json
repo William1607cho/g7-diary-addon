@@ -1,0 +1,54 @@
+{
+  "comment": "Save bar of the [날씨] tab: the list goes to the core plugin settings route (merge save, only weather_options). DiarySettingsFormListener checks it and gives new chips their keys; the response carries the saved list with the keys.",
+  "type": "basic",
+  "name": "Div",
+  "props": { "className": "g7da-adm-savebar" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-adm-status", "role": "status", "aria-live": "polite" },
+      "children": [
+        { "type": "basic", "name": "P", "if": "{{_local.g7da?.dirty?.weather && !_local.g7da?.valid?.weather}}", "props": { "className": "g7da-adm-err" }, "text": "$t:g7-diary-addon.admin.fix_chips" },
+        { "type": "basic", "name": "P", "if": "{{(_local.g7da?.serverErrors?.weather?.length ?? 0) > 0}}", "props": { "className": "g7da-adm-err", "role": "alert" }, "text": "{{(_local.g7da?.serverErrors?.weather ?? []).join(' · ')}}" },
+        { "type": "basic", "name": "P", "if": "{{_local.g7da?.dirty?.weather && _local.g7da?.valid?.weather}}", "props": { "className": "g7da-adm-note" }, "text": "$t:g7-diary-addon.admin.unsaved_note" }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Button",
+      "props": {
+        "type": "button",
+        "className": "btn btn-primary g7da-adm-save",
+        "disabled": "{{!_local.g7da?.dirty?.weather || !_local.g7da?.valid?.weather || !!_local.g7da?.busy}}",
+        "data-testid": "g7da-adm-save-weather"
+      },
+      "actions": [
+        {
+          "type": "click",
+          "handler": "sequence",
+          "actions": [
+            { "handler": "g7-diary-addon.admin", "params": { "op": "busy", "tab": "weather" } },
+            {
+              "handler": "apiCall",
+              "auth_required": true,
+              "target": "/api/admin/plugins/g7-diary-addon/settings",
+              "params": { "method": "PUT", "body": { "weather_options": "{{(_local.g7da?.weather ?? []).map(w => ({key: w.key, emoji: w.emoji, label: w.label}))}}" } },
+              "onSuccess": [
+                { "handler": "g7-diary-addon.admin", "params": { "op": "saved", "tab": "weather", "data": "{{response.data}}" } },
+                { "handler": "toast", "params": { "type": "success", "message": "$t:g7-diary-addon.admin.saved" } }
+              ],
+              "onError": [
+                { "handler": "g7-diary-addon.admin", "params": { "op": "saveFailed", "tab": "weather", "errors": "{{error.errors}}" } },
+                { "handler": "toast", "params": { "type": "error", "message": "{{error.message ?? $t('g7-diary-addon.admin.save_error')}}" } }
+              ]
+            }
+          ]
+        }
+      ],
+      "children": [
+        { "type": "basic", "name": "Span", "text": "{{_local.g7da?.busy === 'weather' ? $t('g7-diary-addon.admin.saving') : $t('g7-diary-addon.admin.save')}}" }
+      ]
+    }
+  ]
+}

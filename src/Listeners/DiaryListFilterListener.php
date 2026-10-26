@@ -96,7 +96,8 @@ class DiaryListFilterListener implements HookListenerInterface
 
         $category = $this->requestedCategory();
         if ($category !== null) {
-            $parts = array_merge($parts, DiaryCategoryFilter::cacheParts($category, $this->visibility->isBoardWide($slug), $this->viewerId()));
+            $set = DiaryCategoryFilter::setVersion(array_keys($this->catalog->categoriesById()), $this->catalog->defaultCategoryId());
+            $parts = array_merge($parts, DiaryCategoryFilter::cacheParts($category, $this->visibility->isBoardWide($slug), $this->viewerId(), $set));
         }
         $date = DiaryDateFilter::parse(request()->query(DiaryDateFilter::PARAM));
         if ($date !== null) {

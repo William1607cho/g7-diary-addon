@@ -1,0 +1,49 @@
+{
+  "comment": "[일기 분류] tab: head row, the sortable category rows (drag handle or the up/down buttons), + 분류 추가, messages and the tab's save button. Deleting only marks the row in the screen; saving writes the whole list in one transaction (D100).",
+  "type": "basic",
+  "name": "Div",
+  "if": "{{_local.g7da?.tab === 'cats'}}",
+  "props": { "className": "g7da-adm-panel", "role": "tabpanel", "id": "g7da-adm-panel-cats", "aria-labelledby": "g7da-adm-tab-cats", "data-testid": "g7da-adm-panel-cats" },
+  "children": [
+    { "type": "basic", "name": "P", "props": { "className": "g7da-adm-help" }, "text": "$t:g7-diary-addon.admin.cats_help" },
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-adm-crow g7da-adm-chead", "aria-hidden": "true" },
+      "children": [
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-adm-c-order" }, "text": "$t:g7-diary-addon.admin.col_order" },
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-adm-c-emoji" }, "text": "$t:g7-diary-addon.admin.col_emoji" },
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-adm-c-name" }, "text": "$t:g7-diary-addon.admin.col_name" },
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-adm-c-color" }, "text": "$t:g7-diary-addon.admin.col_color" },
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-adm-c-default" }, "text": "$t:g7-diary-addon.admin.col_default" },
+        { "type": "basic", "name": "Span", "props": { "className": "g7da-adm-c-del" }, "text": "$t:g7-diary-addon.admin.col_delete" }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-adm-crows", "role": "list", "aria-label": "$t:g7-diary-addon.admin.tab_cats", "data-testid": "g7da-adm-cat-rows" },
+      "sortable": { "source": "{{_local.g7da?.cats ?? []}}", "itemKey": "uid", "strategy": "verticalList", "handle": "[data-drag-handle]", "itemVar": "$item", "indexVar": "$index" },
+      "itemTemplate": { "g7da_include": "admin/cat-row" },
+      "actions": [
+        { "event": "onSortEnd", "handler": "g7-diary-addon.admin", "params": { "op": "catSorted", "items": "{{$sortedItems}}" } }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Button",
+      "props": {
+        "type": "button",
+        "className": "g7da-adm-add",
+        "disabled": "{{(_local.g7da?.cats?.length ?? 0) >= 30}}",
+        "data-testid": "g7da-adm-cat-add"
+      },
+      "actions": [{ "type": "click", "handler": "g7-diary-addon.admin", "params": { "op": "catAdd" } }],
+      "children": [
+        { "type": "basic", "name": "Icon", "props": { "name": "plus", "aria-hidden": "true" } },
+        { "type": "basic", "name": "Span", "text": "$t:g7-diary-addon.admin.cat_add" }
+      ]
+    },
+    { "g7da_include": "admin/save-cats" }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "comment": "Display fields: list mode + per load (empty = the board's list size), photo mode + per load (6–120). Modes are radio pairs (keyboard: arrows inside the group).",
+  "type": "basic",
+  "name": "Div",
+  "props": { "className": "g7da-adm-fieldgroup" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Div",
+      "iteration": { "source": "{{[{f: 'list_display_mode', n: 'list_page_size', t: $t('g7-diary-addon.admin.list_mode'), h: $t('g7-diary-addon.admin.list_mode_hint'), nt: $t('g7-diary-addon.admin.list_size'), nh: $t('g7-diary-addon.admin.list_size_hint'), min: 1, max: 100}, {f: 'photo_display_mode', n: 'photo_page_size', t: $t('g7-diary-addon.admin.photo_mode'), h: $t('g7-diary-addon.admin.photo_mode_hint'), nt: $t('g7-diary-addon.admin.photo_size'), nh: $t('g7-diary-addon.admin.photo_size_hint'), min: 6, max: 120}]}}", "item_var": "fd" },
+      "props": { "className": "g7da-adm-pair" },
+      "children": [
+        {
+          "type": "basic",
+          "name": "Fieldset",
+          "props": { "className": "g7da-adm-field" },
+          "children": [
+            { "type": "basic", "name": "Legend", "props": { "className": "g7da-adm-label" }, "text": "{{fd.t}}" },
+            {
+              "type": "basic",
+              "name": "Div",
+              "props": { "className": "g7da-adm-seg" },
+              "children": [
+                {
+                  "type": "basic",
+                  "name": "Label",
+                  "iteration": { "source": "{{[{v: 'paginate', t: $t('g7-diary-addon.admin.mode_paginate')}, {v: 'infinite', t: $t('g7-diary-addon.admin.mode_infinite')}]}}", "item_var": "md" },
+                  "props": { "className": "{{'g7da-adm-segopt' + (_local.g7da?.disp?.[fd.f] === md.v ? ' is-on' : '')}}" },
+                  "children": [
+                    { "type": "basic", "name": "Input", "props": { "type": "radio", "name": "{{'g7da-' + fd.f}}", "value": "{{md.v}}", "checked": "{{_local.g7da?.disp?.[fd.f] === md.v}}", "data-testid": "{{'g7da-adm-' + fd.f + '-' + md.v}}" }, "actions": [{ "type": "change", "handler": "g7-diary-addon.admin", "params": { "op": "dispField", "field": "{{fd.f}}", "value": "{{md.v}}" } }] },
+                    { "type": "basic", "name": "Span", "text": "{{md.t}}" }
+                  ]
+                }
+              ]
+            },
+            { "type": "basic", "name": "P", "props": { "className": "g7da-adm-hint" }, "text": "{{fd.h}}" }
+          ]
+        },
+        {
+          "type": "basic",
+          "name": "Div",
+          "props": { "className": "g7da-adm-field" },
+          "children": [
+            { "type": "basic", "name": "Label", "props": { "className": "g7da-adm-label", "htmlFor": "{{'g7da-' + fd.n}}" }, "text": "{{fd.nt}}" },
+            { "type": "basic", "name": "Input", "props": { "id": "{{'g7da-' + fd.n}}", "type": "number", "inputMode": "numeric", "min": "{{fd.min}}", "max": "{{fd.max}}", "className": "input g7da-adm-num", "value": "{{_local.g7da?.disp?.[fd.n] ?? ''}}", "aria-invalid": "{{_local.g7da?.errors?.disp?.fields?.[fd.n] ? 'true' : 'false'}}", "data-testid": "{{'g7da-adm-' + fd.n}}" }, "actions": [{ "type": "change", "handler": "g7-diary-addon.admin", "params": { "op": "dispField", "field": "{{fd.n}}", "value": "{{$event.target.value}}" } }] },
+            { "type": "basic", "name": "P", "props": { "className": "g7da-adm-hint" }, "text": "{{fd.nh}}" },
+            { "type": "basic", "name": "P", "if": "{{!!_local.g7da?.errors?.disp?.fields?.[fd.n]}}", "props": { "className": "g7da-adm-err", "role": "alert" }, "text": "{{_local.g7da?.msg?.[_local.g7da?.errors?.disp?.fields?.[fd.n]] ?? ''}}" }
+          ]
+        }
+      ]
+    }
+  ]
+}

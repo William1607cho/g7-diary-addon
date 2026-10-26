@@ -12,6 +12,7 @@ use Plugins\G7\Diary\Addon\Listeners\DiaryListFilterListener;
 use Plugins\G7\Diary\Addon\Listeners\DiaryPurgeListener;
 use Plugins\G7\Diary\Addon\Listeners\DiaryRouteListener;
 use Plugins\G7\Diary\Addon\Listeners\DiarySaveListener;
+use Plugins\G7\Diary\Addon\Listeners\DiarySettingsFormListener;
 use Plugins\G7\Diary\Addon\Listeners\DiaryValidationListener;
 use Plugins\G7\Diary\Addon\Support\DiaryBoards;
 use Plugins\G7\Diary\Addon\Support\DiaryCategories;
@@ -19,8 +20,8 @@ use Plugins\G7\Diary\Addon\Support\DiarySettings;
 use Plugins\G7\Diary\Addon\Support\DiarySettingsSchema;
 
 /**
- * Diary Board Add-on (g7-diary-addon) — bundles 1–2: board type, tables, save flow, and
- * the list / show / write screens.
+ * Diary Board Add-on (g7-diary-addon) — board type, tables, save flow, the list / show /
+ * write screens, calendar / photo / 지난 오늘 screens and the admin settings screen.
  *
  * Adds a `diary` board type to sirsoft-board. On diary boards the title is optional and
  * filled automatically, and each post gets diary metadata (category, weather, diary date)
@@ -29,7 +30,9 @@ use Plugins\G7\Diary\Addon\Support\DiarySettingsSchema;
  * sirsoft-board and the visitor template are not modified, and no repository is rebound —
  * everything goes through hooks, response middleware and layout filters.
  *
- * Calendar, photos, memories and category management come in later bundles.
+ * The admin settings screen 일기장 설정 (`resources/layouts/admin/plugin_settings.json`, opened
+ * by the core at /admin/plugins/g7-diary-addon/settings) manages categories, weather, display
+ * modes and texts; its scripts and styles load on that screen only.
  */
 class Plugin extends AbstractPlugin
 {
@@ -59,6 +62,8 @@ class Plugin extends AbstractPlugin
      * - DiaryListFilterListener: `diary_category` list filter and its count-cache axis.
      * - DiaryLayoutListener: diary list branch, show info line and form fields (layout filter).
      * - DiaryRouteListener: calendar / photo screen routes on user templates (route filter).
+     * - DiarySettingsFormListener: weather list checks and fixed keys on the core plugin
+     *   settings save route (this plugin only).
      *
      * @return array<int, class-string>
      */
@@ -72,6 +77,7 @@ class Plugin extends AbstractPlugin
             DiaryListFilterListener::class,
             DiaryLayoutListener::class,
             DiaryRouteListener::class,
+            DiarySettingsFormListener::class,
         ];
     }
 
@@ -117,7 +123,8 @@ class Plugin extends AbstractPlugin
     }
 
     /**
-     * Settings schema (minimal; the settings screen comes in a later bundle).
+     * Settings schema (types and ranges for the core save route; the screen is the plugin's own
+     * layout, and the weather list gets extra checks from DiarySettingsFormListener).
      *
      * @return array<string, array<string, mixed>>
      */

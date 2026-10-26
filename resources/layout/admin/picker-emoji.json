@@ -1,0 +1,39 @@
+{
+  "comment": "Emoji part of the picker: group tabs and the grid of the open group (data: g7daAdmin.data.emoji_groups, admin screen only).",
+  "type": "basic",
+  "name": "Div",
+  "if": "{{_local.g7da?.picker?.kind === 'emoji'}}",
+  "props": { "className": "g7da-adm-emojipart" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-adm-groups", "role": "group", "aria-label": "{{$t('g7-diary-addon.admin.emoji_groups')}}" },
+      "children": [
+        {
+          "type": "basic",
+          "name": "Button",
+          "iteration": { "source": "{{g7daAdmin?.data?.emoji_groups ?? []}}", "item_var": "grp" },
+          "props": { "type": "button", "className": "{{'g7da-adm-group' + (_local.g7da?.picker?.group === grp.key ? ' is-on' : '')}}", "aria-pressed": "{{_local.g7da?.picker?.group === grp.key ? 'true' : 'false'}}", "data-testid": "{{'g7da-adm-group-' + grp.key}}" },
+          "actions": [{ "type": "click", "handler": "g7-diary-addon.admin", "params": { "op": "pickerGroup", "group": "{{grp.key}}" } }],
+          "text": "{{grp.label}}"
+        }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-adm-grid", "role": "group", "aria-label": "{{$t('g7-diary-addon.admin.pick_emoji')}}", "data-testid": "g7da-adm-grid" },
+      "children": [
+        {
+          "type": "basic",
+          "name": "Button",
+          "iteration": { "source": "{{((g7daAdmin?.data?.emoji_groups ?? []).find(g => g.key === _local.g7da?.picker?.group) ?? {emojis: []}).emojis}}", "item_var": "em" },
+          "props": { "type": "button", "className": "g7da-adm-cell", "aria-label": "{{em}}", "data-g7da-emoji": "{{em}}" },
+          "actions": [{ "type": "click", "handler": "g7-diary-addon.admin", "params": { "op": "pickerPick", "value": "{{em}}" } }],
+          "text": "{{em}}"
+        }
+      ]
+    }
+  ]
+}

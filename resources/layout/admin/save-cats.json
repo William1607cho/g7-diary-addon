@@ -1,0 +1,55 @@
+{
+  "comment": "Save bar of the [일기 분류] tab: why it cannot be saved (rule broken / server refusal) and the save button. PUT admin/categories writes the whole list in one transaction; the response is the saved list (new ids).",
+  "type": "basic",
+  "name": "Div",
+  "props": { "className": "g7da-adm-savebar" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-adm-status", "role": "status", "aria-live": "polite" },
+      "children": [
+        { "type": "basic", "name": "P", "if": "{{!!_local.g7da?.errors?.cats?.general}}", "props": { "className": "g7da-adm-err" }, "text": "{{_local.g7da?.msg?.[_local.g7da?.errors?.cats?.general] ?? ''}}" },
+        { "type": "basic", "name": "P", "if": "{{_local.g7da?.dirty?.cats && !_local.g7da?.valid?.cats && !_local.g7da?.errors?.cats?.general}}", "props": { "className": "g7da-adm-err" }, "text": "$t:g7-diary-addon.admin.fix_rows" },
+        { "type": "basic", "name": "P", "if": "{{(_local.g7da?.serverErrors?.cats?.length ?? 0) > 0}}", "props": { "className": "g7da-adm-err", "role": "alert" }, "text": "{{(_local.g7da?.serverErrors?.cats ?? []).join(' · ')}}" },
+        { "type": "basic", "name": "P", "if": "{{_local.g7da?.dirty?.cats && _local.g7da?.valid?.cats}}", "props": { "className": "g7da-adm-note" }, "text": "$t:g7-diary-addon.admin.unsaved_note" }
+      ]
+    },
+    {
+      "type": "basic",
+      "name": "Button",
+      "props": {
+        "type": "button",
+        "className": "btn btn-primary g7da-adm-save",
+        "disabled": "{{!_local.g7da?.dirty?.cats || !_local.g7da?.valid?.cats || !!_local.g7da?.busy}}",
+        "data-testid": "g7da-adm-save-cats"
+      },
+      "actions": [
+        {
+          "type": "click",
+          "handler": "sequence",
+          "actions": [
+            { "handler": "g7-diary-addon.admin", "params": { "op": "busy", "tab": "cats" } },
+            {
+              "handler": "apiCall",
+              "auth_required": true,
+              "target": "/api/plugins/g7-diary-addon/admin/categories",
+              "params": { "method": "PUT", "body": { "categories": "{{_local.g7da?.cats ?? []}}" } },
+              "onSuccess": [
+                { "handler": "g7-diary-addon.admin", "params": { "op": "saved", "tab": "cats", "data": "{{response.data}}" } },
+                { "handler": "toast", "params": { "type": "success", "message": "$t:g7-diary-addon.admin.saved" } }
+              ],
+              "onError": [
+                { "handler": "g7-diary-addon.admin", "params": { "op": "saveFailed", "tab": "cats", "errors": "{{error.errors}}" } },
+                { "handler": "toast", "params": { "type": "error", "message": "{{error.message ?? $t('g7-diary-addon.admin.save_error')}}" } }
+              ]
+            }
+          ]
+        }
+      ],
+      "children": [
+        { "type": "basic", "name": "Span", "text": "{{_local.g7da?.busy === 'cats' ? $t('g7-diary-addon.admin.saving') : $t('g7-diary-addon.admin.save')}}" }
+      ]
+    }
+  ]
+}

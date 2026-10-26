@@ -47,15 +47,34 @@ final class DiaryCategoryFilter
     }
 
     /**
-     * Count-cache parts: the category and who is looking (the filtered count differs per
-     * viewer — board managers share one key, members get their own, guests one).
+     * Count-cache parts: the category, who is looking (the filtered count differs per
+     * viewer — board managers share one key, members get their own, guests one) and the
+     * category set (bundle 4, D105): adding, deleting or re-defaulting categories on the
+     * admin screen changes which posts a filter holds, so the counts move to new keys.
      *
      * @return array<int, string>
      */
-    public static function cacheParts(int $category, bool $boardWide, ?int $viewerId): array
+    public static function cacheParts(int $category, bool $boardWide, ?int $viewerId, string $setVersion = ''): array
     {
         $viewer = $boardWide ? 'all' : ($viewerId === null ? 'guest' : 'u'.$viewerId);
+        $parts = ['g7da_cat:'.$category, 'g7da_v:'.$viewer];
+        if ($setVersion !== '') {
+            $parts[] = 'g7da_cs:'.$setVersion;
+        }
 
-        return ['g7da_cat:'.$category, 'g7da_v:'.$viewer];
+        return $parts;
+    }
+
+    /**
+     * Short fingerprint of the active category ids and the default id.
+     *
+     * @param  array<int, int>  $activeIds
+     */
+    public static function setVersion(array $activeIds, ?int $defaultId): string
+    {
+        $ids = array_map('intval', $activeIds);
+        sort($ids);
+
+        return substr(md5(implode(',', $ids).'|'.($defaultId ?? 0)), 0, 12);
     }
 }

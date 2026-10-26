@@ -1,0 +1,20 @@
+{
+  "comment": "Text fields: auto title length (5–100), title of a photo-only diary, the not-enough-memories text.",
+  "type": "basic",
+  "name": "Div",
+  "props": { "className": "g7da-adm-fieldgroup" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Div",
+      "iteration": { "source": "{{[{n: 'auto_title_length', type: 'number', t: $t('g7-diary-addon.admin.title_length'), h: $t('g7-diary-addon.admin.title_length_hint')}, {n: 'photo_diary_title', type: 'text', t: $t('g7-diary-addon.admin.photo_title'), h: $t('g7-diary-addon.admin.photo_title_hint')}, {n: 'memories_empty_text', type: 'text', t: $t('g7-diary-addon.admin.memories_empty'), h: $t('g7-diary-addon.admin.memories_empty_hint')}]}}", "item_var": "fd" },
+      "props": { "className": "g7da-adm-field" },
+      "children": [
+        { "type": "basic", "name": "Label", "props": { "className": "g7da-adm-label", "htmlFor": "{{'g7da-' + fd.n}}" }, "text": "{{fd.t}}" },
+        { "type": "basic", "name": "Input", "props": { "id": "{{'g7da-' + fd.n}}", "type": "{{fd.type}}", "maxLength": 100, "className": "{{'input ' + (fd.type === 'number' ? 'g7da-adm-num' : 'g7da-adm-text')}}", "value": "{{_local.g7da?.disp?.[fd.n] ?? ''}}", "aria-invalid": "{{_local.g7da?.errors?.disp?.fields?.[fd.n] ? 'true' : 'false'}}", "data-testid": "{{'g7da-adm-' + fd.n}}" }, "actions": [{ "type": "change", "handler": "g7-diary-addon.admin", "params": { "op": "dispField", "field": "{{fd.n}}", "value": "{{$event.target.value}}" } }] },
+        { "type": "basic", "name": "P", "props": { "className": "g7da-adm-hint" }, "text": "{{fd.h}}" },
+        { "type": "basic", "name": "P", "if": "{{!!_local.g7da?.errors?.disp?.fields?.[fd.n]}}", "props": { "className": "g7da-adm-err", "role": "alert" }, "text": "{{_local.g7da?.msg?.[_local.g7da?.errors?.disp?.fields?.[fd.n]] ?? ''}}" }
+      ]
+    }
+  ]
+}

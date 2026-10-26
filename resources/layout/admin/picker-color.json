@@ -1,0 +1,27 @@
+{
+  "comment": "Colour part of the picker: the nine swatches (seven default colours, grey, teal — ColorTone::SWATCHES) with the tint the visitor screens show (colour at about 20% over the card, theme text on it — D104).",
+  "type": "basic",
+  "name": "Div",
+  "if": "{{_local.g7da?.picker?.kind === 'color'}}",
+  "props": { "className": "g7da-adm-colorpart" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-adm-swatches", "role": "group", "aria-label": "{{$t('g7-diary-addon.admin.pick_color')}}" },
+      "children": [
+        {
+          "type": "basic",
+          "name": "Button",
+          "iteration": { "source": "{{g7daAdmin?.data?.swatches ?? []}}", "item_var": "sw" },
+          "props": { "type": "button", "className": "g7da-adm-swbtn", "aria-label": "{{sw}}", "data-testid": "{{'g7da-adm-sw-' + sw.slice(1)}}" },
+          "actions": [{ "type": "click", "handler": "g7-diary-addon.admin", "params": { "op": "pickerPick", "value": "{{sw}}" } }],
+          "children": [
+            { "type": "basic", "name": "Span", "props": { "className": "g7da-adm-swatch is-big", "style": { "backgroundColor": "{{sw}}" }, "aria-hidden": "true" } },
+            { "type": "basic", "name": "Span", "props": { "className": "g7da-adm-tint is-small", "style": { "backgroundColor": "{{sw + '33'}}" }, "aria-hidden": "true" }, "text": "가" }
+          ]
+        }
+      ]
+    }
+  ]
+}

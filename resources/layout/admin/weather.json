@@ -1,0 +1,32 @@
+{
+  "comment": "[날씨] tab: chips (emoji button + name + ✕, drag or ◀ ▶ to reorder) and + 날씨 추가 (a new chip opens the picker on the weather group). Keys are fixed (D106): renaming keeps the key, a new chip gets its key from the server. With no weather the write form hides the row.",
+  "type": "basic",
+  "name": "Div",
+  "if": "{{_local.g7da?.tab === 'weather'}}",
+  "props": { "className": "g7da-adm-panel", "role": "tabpanel", "id": "g7da-adm-panel-weather", "aria-labelledby": "g7da-adm-tab-weather", "data-testid": "g7da-adm-panel-weather" },
+  "children": [
+    { "type": "basic", "name": "P", "props": { "className": "g7da-adm-help" }, "text": "$t:g7-diary-addon.admin.weather_help" },
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-adm-chips", "role": "list", "aria-label": "$t:g7-diary-addon.admin.tab_weather", "data-testid": "g7da-adm-chips" },
+      "sortable": { "source": "{{_local.g7da?.weather ?? []}}", "itemKey": "uid", "strategy": "rectSorting", "handle": "[data-drag-handle]", "itemVar": "$item", "indexVar": "$index" },
+      "itemTemplate": { "g7da_include": "admin/chip" },
+      "actions": [
+        { "event": "onSortEnd", "handler": "g7-diary-addon.admin", "params": { "op": "weatherSorted", "items": "{{$sortedItems}}" } }
+      ]
+    },
+    { "type": "basic", "name": "P", "if": "{{(_local.g7da?.weather?.length ?? 0) === 0}}", "props": { "className": "g7da-adm-note" }, "text": "$t:g7-diary-addon.admin.weather_none" },
+    {
+      "type": "basic",
+      "name": "Button",
+      "props": { "type": "button", "className": "g7da-adm-add", "disabled": "{{(_local.g7da?.weather?.length ?? 0) >= 20}}", "data-g7da-opener": "weather:new", "data-testid": "g7da-adm-weather-add" },
+      "actions": [{ "type": "click", "handler": "g7-diary-addon.admin", "params": { "op": "weatherAdd" } }],
+      "children": [
+        { "type": "basic", "name": "Icon", "props": { "name": "plus", "aria-hidden": "true" } },
+        { "type": "basic", "name": "Span", "text": "$t:g7-diary-addon.admin.weather_add" }
+      ]
+    },
+    { "g7da_include": "admin/save-weather" }
+  ]
+}

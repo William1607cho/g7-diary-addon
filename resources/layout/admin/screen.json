@@ -1,0 +1,39 @@
+{
+  "comment": "Admin settings screen 일기장 설정 (bundle 4, D98): page head, three tabs, the open tab's panel, the emoji picker and the in-screen confirm box. State: _local.g7da (admin-state.js). Nothing editable is drawn before the data has arrived.",
+  "type": "basic",
+  "name": "Div",
+  "props": { "className": "g7da-adm-screen" },
+  "children": [
+    {
+      "type": "composite",
+      "name": "PageHeader",
+      "props": {
+        "title": "$t:g7-diary-addon.admin.title",
+        "description": "$t:g7-diary-addon.admin.description",
+        "backPath": "/admin/plugins",
+        "backLabel": "$t:admin.plugins.back_to_list"
+      }
+    },
+    {
+      "type": "basic",
+      "name": "P",
+      "if": "{{!_local.g7da}}",
+      "props": { "className": "g7da-adm-loading", "role": "status" },
+      "text": "$t:g7-diary-addon.loading"
+    },
+    {
+      "type": "basic",
+      "name": "Div",
+      "if": "{{!!_local.g7da}}",
+      "props": { "className": "g7da-adm-body" },
+      "children": [
+        { "g7da_include": "admin/tabs" },
+        { "g7da_include": "admin/cats" },
+        { "g7da_include": "admin/weather" },
+        { "g7da_include": "admin/disp" },
+        { "g7da_include": "admin/picker" },
+        { "g7da_include": "admin/dialog" }
+      ]
+    }
+  ]
+}

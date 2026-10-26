@@ -3,7 +3,8 @@
 namespace Plugins\G7\Diary\Addon\Support;
 
 /**
- * Plugin settings schema (minimal; the settings screen comes in a later bundle).
+ * Plugin settings schema: types and ranges the core settings save route checks (the admin
+ * screen is the plugin's own layout — bundle 4).
  * Defaults come from {@see DiarySettings::DEFAULTS}.
  */
 final class DiarySettingsSchema

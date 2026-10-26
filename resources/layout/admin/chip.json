@@ -1,0 +1,40 @@
+{
+  "comment": "One weather chip ($item, $index): drag handle, emoji button (picker), name, ◀ ▶ for the keyboard, ✕ (asks with the number of posts that use the key).",
+  "type": "basic",
+  "name": "Div",
+  "props": { "className": "g7da-adm-chip", "role": "listitem", "data-testid": "{{'g7da-adm-chip-' + $item.uid}}" },
+  "children": [
+    { "type": "basic", "name": "Button", "props": { "type": "button", "className": "g7da-adm-grip", "data-drag-handle": true, "aria-label": "$t:defer:g7-diary-addon.admin.drag_named|name={{$item.label}}", "data-g7da-tip": "{{$t('g7-diary-addon.admin.drag')}}" }, "children": [{ "type": "basic", "name": "Icon", "props": { "name": "grip-vertical", "aria-hidden": "true" } }] },
+    {
+      "type": "basic",
+      "name": "Button",
+      "props": { "type": "button", "className": "{{'g7da-adm-emoji is-small' + ($item.emoji ? '' : ' is-empty')}}", "aria-haspopup": "dialog", "aria-label": "$t:defer:g7-diary-addon.admin.pick_emoji_for|name={{$item.label}}", "data-g7da-opener": "{{'emoji:' + $item.uid}}", "data-testid": "{{'g7da-adm-chip-emoji-' + $item.uid}}" },
+      "actions": [{ "type": "click", "handler": "g7-diary-addon.admin", "params": { "op": "pickerOpen", "list": "weather", "uid": "{{$item.uid}}" } }],
+      "children": [{ "type": "basic", "name": "Span", "props": { "aria-hidden": "true" }, "text": "{{$item.emoji || '＋'}}" }]
+    },
+    {
+      "type": "basic",
+      "name": "Input",
+      "props": {
+        "type": "text",
+        "className": "input g7da-adm-chipname",
+        "value": "{{$item.label}}",
+        "maxLength": 40,
+        "placeholder": "{{$t('g7-diary-addon.admin.name_placeholder')}}",
+        "aria-label": "{{$t('g7-diary-addon.admin.weather_name')}}",
+        "aria-invalid": "{{_local.g7da?.errors?.weather?.rows?.[$item.uid]?.label ? 'true' : 'false'}}",
+        "data-testid": "{{'g7da-adm-chip-name-' + $item.uid}}"
+      },
+      "actions": [{ "type": "change", "handler": "g7-diary-addon.admin", "params": { "op": "weatherField", "uid": "{{$item.uid}}", "value": "{{$event.target.value}}" } }]
+    },
+    { "type": "basic", "name": "Button", "props": { "type": "button", "className": "g7da-adm-mini", "disabled": "{{$index === 0}}", "aria-label": "$t:defer:g7-diary-addon.admin.move_left_named|name={{$item.label}}", "data-g7da-tip": "{{$t('g7-diary-addon.admin.move_left')}}" }, "actions": [{ "type": "click", "handler": "g7-diary-addon.admin", "params": { "op": "weatherMove", "uid": "{{$item.uid}}", "dir": -1 } }], "children": [{ "type": "basic", "name": "Icon", "props": { "name": "chevron-left", "aria-hidden": "true" } }] },
+    { "type": "basic", "name": "Button", "props": { "type": "button", "className": "g7da-adm-mini", "disabled": "{{$index === (_local.g7da?.weather?.length ?? 1) - 1}}", "aria-label": "$t:defer:g7-diary-addon.admin.move_right_named|name={{$item.label}}", "data-g7da-tip": "{{$t('g7-diary-addon.admin.move_right')}}" }, "actions": [{ "type": "click", "handler": "g7-diary-addon.admin", "params": { "op": "weatherMove", "uid": "{{$item.uid}}", "dir": 1 } }], "children": [{ "type": "basic", "name": "Icon", "props": { "name": "chevron-right", "aria-hidden": "true" } }] },
+    {
+      "type": "basic",
+      "name": "Button",
+      "props": { "type": "button", "className": "g7da-adm-x", "aria-label": "$t:defer:g7-diary-addon.admin.delete_named|name={{$item.label}}", "data-g7da-tip": "{{$t('g7-diary-addon.admin.delete')}}", "data-testid": "{{'g7da-adm-chip-del-' + $item.uid}}" },
+      "actions": [{ "type": "click", "handler": "g7-diary-addon.admin", "params": { "op": "weatherDeleteAsk", "uid": "{{$item.uid}}" } }],
+      "children": [{ "type": "basic", "name": "Icon", "props": { "name": "xmark", "aria-hidden": "true" } }]
+    }
+  ]
+}

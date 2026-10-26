@@ -65,9 +65,13 @@ class PhotoAndSettingsTest extends TestCase
         $this->assertSame(['fog'], DiarySettings::weatherKeys($s));
     }
 
-    public function test_empty_weather_list_falls_back_to_defaults(): void
+    public function test_empty_weather_list_means_no_weather_and_broken_list_falls_back(): void
     {
-        $s = DiarySettings::normalize(['weather_options' => []]);
-        $this->assertSame(DiarySettings::DEFAULTS['weather_options'], $s['weather_options']);
+        // Bundle 4: a saved empty list is "no weather" (the write form hides the row).
+        $this->assertSame([], DiarySettings::normalize(['weather_options' => []])['weather_options']);
+        $this->assertSame([], DiarySettings::weatherKeys(DiarySettings::normalize(['weather_options' => []])));
+        // Missing value or nothing valid left: the defaults.
+        $this->assertSame(DiarySettings::DEFAULTS['weather_options'], DiarySettings::normalize([])['weather_options']);
+        $this->assertSame(DiarySettings::DEFAULTS['weather_options'], DiarySettings::normalize(['weather_options' => [['key' => 'Bad Key']]])['weather_options']);
     }
 }

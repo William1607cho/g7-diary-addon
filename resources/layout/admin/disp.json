@@ -1,0 +1,29 @@
+{
+  "comment": "[표시·문구] tab: list / photo display mode and page size, auto title length, photo-only title, the not-enough-memories text, and the 지난 오늘 order note (text only, moved here from the visitor popup — D97). Each field has a short hint.",
+  "type": "basic",
+  "name": "Div",
+  "if": "{{_local.g7da?.tab === 'disp'}}",
+  "props": { "className": "g7da-adm-panel", "role": "tabpanel", "id": "g7da-adm-panel-disp", "aria-labelledby": "g7da-adm-tab-disp", "data-testid": "g7da-adm-panel-disp" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-adm-fields" },
+      "children": [
+        { "g7da_include": "admin/disp-modes" },
+        { "g7da_include": "admin/disp-texts" },
+        {
+          "type": "basic",
+          "name": "Div",
+          "props": { "className": "g7da-adm-field g7da-adm-memo" },
+          "children": [
+            { "type": "basic", "name": "H3", "props": { "className": "g7da-adm-label" }, "text": "$t:g7-diary-addon.admin.memories_order" },
+            { "type": "basic", "name": "P", "props": { "className": "g7da-adm-memo-main" }, "text": "$t:g7-diary-addon.admin.memories_order_text" },
+            { "type": "basic", "name": "P", "props": { "className": "g7da-adm-hint" }, "text": "$t:g7-diary-addon.admin.memories_order_more" }
+          ]
+        }
+      ]
+    },
+    { "g7da_include": "admin/save-disp" }
+  ]
+}

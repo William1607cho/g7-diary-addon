@@ -5,7 +5,8 @@ namespace Plugins\G7\Diary\Addon\Layout;
 /**
  * Layout fragments of the diary screens — JSON files under `resources/layout/` (pure).
  *
- * A node `{"g7da_include": "index/card"}` is replaced by that fragment; a node
+ * A node `{"g7da_include": "index/card"}` is replaced by that fragment (in `children`,
+ * `actions`, `lifecycle.*` and a sortable's `itemTemplate`); a node
  * `{"g7da_slot": "…"}` marks a place kept for a later bundle and is removed. Loaded
  * fragments are memoized per process (they are files of this plugin, not user data).
  */
@@ -75,6 +76,10 @@ final class Fragments
             if (isset($node[$key]) && is_array($node[$key])) {
                 $node[$key] = $this->resolveList($node[$key], $depth);
             }
+        }
+        // The item of a `sortable` list (bundle 4 admin screen) may be a fragment of its own.
+        if (isset($node['itemTemplate']) && is_array($node['itemTemplate'])) {
+            $node['itemTemplate'] = $this->resolve($node['itemTemplate'], $depth + 1);
         }
         // Lifecycle action lists (onMount, …) may include shared action fragments too.
         foreach (is_array($node['lifecycle'] ?? null) ? $node['lifecycle'] : [] as $key => $list) {

@@ -1,0 +1,32 @@
+{
+  "comment": "Tabs [일기 분류] [날씨] [표시·문구]. Leaving a tab with unsaved changes asks in the confirm box (op tab). A dot marks a tab with unsaved changes.",
+  "type": "basic",
+  "name": "Div",
+  "props": { "className": "g7da-adm-tabs", "role": "tablist", "aria-label": "$t:g7-diary-addon.admin.title" },
+  "children": [
+    {
+      "type": "basic",
+      "name": "Button",
+      "iteration": { "source": "{{[{k: 'cats', t: $t('g7-diary-addon.admin.tab_cats')}, {k: 'weather', t: $t('g7-diary-addon.admin.tab_weather')}, {k: 'disp', t: $t('g7-diary-addon.admin.tab_disp')}]}}", "item_var": "tb" },
+      "props": {
+        "type": "button",
+        "role": "tab",
+        "id": "{{'g7da-adm-tab-' + tb.k}}",
+        "aria-controls": "{{'g7da-adm-panel-' + tb.k}}",
+        "aria-selected": "{{_local.g7da?.tab === tb.k ? 'true' : 'false'}}",
+        "className": "{{'g7da-adm-tab' + (_local.g7da?.tab === tb.k ? ' is-on' : '')}}",
+        "data-testid": "{{'g7da-adm-tab-' + tb.k}}"
+      },
+      "actions": [{ "type": "click", "handler": "g7-diary-addon.admin", "params": { "op": "tab", "tab": "{{tb.k}}" } }],
+      "children": [
+        { "type": "basic", "name": "Span", "text": "{{tb.t}}" },
+        {
+          "type": "basic",
+          "name": "Span",
+          "if": "{{!!_local.g7da?.dirty?.[tb.k]}}",
+          "props": { "className": "g7da-adm-dot", "role": "img", "aria-label": "{{$t('g7-diary-addon.admin.unsaved')}}", "data-g7da-tip": "{{$t('g7-diary-addon.admin.unsaved')}}" }
+        }
+      ]
+    }
+  ]
+}

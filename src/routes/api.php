@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Plugins\G7\Diary\Addon\Http\Controllers\Admin\SettingsScreenController;
 use Plugins\G7\Diary\Addon\Http\Controllers\CalendarController;
 use Plugins\G7\Diary\Addon\Http\Controllers\CategoryController;
 use Plugins\G7\Diary\Addon\Http\Controllers\MemoryController;
@@ -37,4 +38,15 @@ Route::middleware(['optional.sanctum', 'throttle:120,1'])
         Route::get('day', [CalendarController::class, 'day'])->name('day');
         Route::get('photos', [PhotoController::class, 'index'])->name('photos');
         Route::get('memories', [MemoryController::class, 'index'])->name('memories');
+    });
+
+// Bundle 4: admin settings screen ("일기장 설정"). Only admins who may save plugin settings
+// (core.plugins.update) — the same permission as the core settings save route (D111).
+Route::prefix('admin')->name('admin.')
+    ->middleware(['auth:sanctum', 'permission:admin,core.plugins.update', 'throttle:120,1'])
+    ->group(function () {
+        Route::get('screen', [SettingsScreenController::class, 'show'])->name('screen');
+        Route::put('categories', [SettingsScreenController::class, 'saveCategories'])->name('categories.save');
+        Route::delete('categories/{id}', [SettingsScreenController::class, 'deleteCategory'])
+            ->where('id', '[0-9]+')->name('categories.delete');
     });

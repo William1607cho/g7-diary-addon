@@ -1,7 +1,8 @@
 {
-  "comment": "Weather emoji buttons from the weather_options setting. Optional; pressing the chosen one again clears it.",
+  "comment": "Weather emoji buttons from the weather_options setting. Optional; pressing the chosen one again clears it. Hidden when the admin screen left no weather (bundle 4).",
   "type": "basic",
   "name": "Div",
+  "if": "{{(form_meta?.data?.diary?.weather_options ?? []).length > 0}}",
   "props": {
     "className": "g7da-weathers",
     "role": "group",

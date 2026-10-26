@@ -57,9 +57,14 @@ class PostEnricher
         $fields = ['diary_category_id' => null, 'diary_weather' => null, 'diary_date' => SiteClock::today()];
         if ($postId > 0 && ($row = $this->reader->postRow($postId)) !== null) {
             $entry = $this->reader->entries([$postId])[$postId] ?? null;
+            // D107: a category or weather that was deleted on the admin screen is shown as
+            // "not chosen" (the same as its display — default category / no weather), so
+            // saving the edit form is not refused for a value that can no longer be picked.
+            $category = isset($entry['category_id']) ? (int) $entry['category_id'] : null;
+            $weather = isset($entry['weather']) && $entry['weather'] !== '' ? (string) $entry['weather'] : null;
             $fields = [
-                'diary_category_id' => isset($entry['category_id']) ? (int) $entry['category_id'] : null,
-                'diary_weather' => isset($entry['weather']) && $entry['weather'] !== '' ? (string) $entry['weather'] : null,
+                'diary_category_id' => isset($this->catalog->categoriesById()[$category]) ? $category : null,
+                'diary_weather' => in_array($weather, array_column($this->catalog->weatherOptions(), 'key'), true) ? $weather : null,
                 'diary_date' => DiaryPostReader::dateOf($entry['diary_date'] ?? null, $row->created_at),
             ];
         }

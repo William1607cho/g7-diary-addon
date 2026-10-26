@@ -3,6 +3,8 @@
 namespace Plugins\G7\Diary\Addon\Providers;
 
 use App\Extension\BasePluginServiceProvider;
+use Plugins\G7\Diary\Addon\Support\CategoryStore;
+use Plugins\G7\Diary\Addon\Support\DbCategoryStore;
 use Plugins\G7\Diary\Addon\Support\DiaryBoards;
 use Plugins\G7\Diary\Addon\Support\DiaryCatalog;
 use Plugins\G7\Diary\Addon\Support\ImageVariants;
@@ -19,7 +21,8 @@ use Plugins\G7\Diary\Addon\Support\SecretVisibility;
  * from the data filters to the after-save hooks (listeners are resolved fresh for every
  * hook call, so they cannot keep state themselves), the display catalog (categories,
  * settings), the board-wide secret check memo and the image-delivery presence check.
- * No repository is rebound.
+ * The category store of the admin screen is bound to its DB implementation (bundle 4).
+ * No repository of another extension is rebound.
  */
 class DiaryAddonServiceProvider extends BasePluginServiceProvider
 {
@@ -34,5 +37,6 @@ class DiaryAddonServiceProvider extends BasePluginServiceProvider
         $this->app->scoped(DiaryCatalog::class);
         $this->app->scoped(SecretVisibility::class);
         $this->app->scoped(ImageVariants::class);
+        $this->app->bind(CategoryStore::class, DbCategoryStore::class);
     }
 }

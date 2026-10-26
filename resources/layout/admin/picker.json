@@ -1,0 +1,46 @@
+{
+  "comment": "Emoji / colour picker (D108). Emoji: group tabs (the weather picker opens on 날씨·자연), a grid, and 직접 입력 (accepted only as one emoji — D103). Colour: the swatches and a 6-digit hex. Closes on Esc, the backdrop or the close button; admin.js keeps focus inside and gives it back to the opener.",
+  "type": "basic",
+  "name": "Div",
+  "if": "{{!!_local.g7da?.picker}}",
+  "props": { "className": "g7da-adm-layer" },
+  "children": [
+    { "type": "basic", "name": "Div", "props": { "className": "g7da-adm-backdrop is-clear", "aria-hidden": "true", "data-testid": "g7da-adm-picker-backdrop" }, "actions": [{ "type": "click", "handler": "g7-diary-addon.admin", "params": { "op": "pickerClose" } }] },
+    {
+      "type": "basic",
+      "name": "Div",
+      "props": { "className": "g7da-adm-picker", "role": "dialog", "aria-modal": "true", "aria-labelledby": "g7da-adm-picker-title", "data-testid": "g7da-adm-picker" },
+      "children": [
+        {
+          "type": "basic",
+          "name": "Div",
+          "props": { "className": "g7da-adm-picker-head" },
+          "children": [
+            { "type": "basic", "name": "H2", "props": { "id": "g7da-adm-picker-title", "className": "g7da-adm-picker-title" }, "text": "{{_local.g7da?.picker?.kind === 'color' ? $t('g7-diary-addon.admin.pick_color') : $t('g7-diary-addon.admin.pick_emoji')}}" },
+            { "type": "basic", "name": "Button", "props": { "type": "button", "className": "g7da-adm-x", "data-g7da-close": true, "aria-label": "{{$t('g7-diary-addon.close')}}" }, "actions": [{ "type": "click", "handler": "g7-diary-addon.admin", "params": { "op": "pickerClose" } }], "children": [{ "type": "basic", "name": "Icon", "props": { "name": "xmark", "aria-hidden": "true" } }] }
+          ]
+        },
+        { "g7da_include": "admin/picker-emoji" },
+        { "g7da_include": "admin/picker-color" },
+        {
+          "type": "basic",
+          "name": "Div",
+          "props": { "className": "g7da-adm-direct" },
+          "children": [
+            { "type": "basic", "name": "Label", "props": { "className": "g7da-adm-label", "htmlFor": "g7da-adm-direct" }, "text": "{{_local.g7da?.picker?.kind === 'color' ? $t('g7-diary-addon.admin.direct_hex') : $t('g7-diary-addon.admin.direct_emoji')}}" },
+            {
+              "type": "basic",
+              "name": "Div",
+              "props": { "className": "g7da-adm-direct-row" },
+              "children": [
+                { "type": "basic", "name": "Input", "props": { "id": "g7da-adm-direct", "type": "text", "className": "input g7da-adm-direct-input", "value": "{{_local.g7da?.picker?.input ?? ''}}", "maxLength": 32, "placeholder": "{{_local.g7da?.picker?.kind === 'color' ? '#22C55E' : '😀'}}", "aria-invalid": "{{_local.g7da?.picker?.error ? 'true' : 'false'}}", "aria-describedby": "g7da-adm-direct-help", "data-testid": "g7da-adm-direct" }, "actions": [{ "type": "change", "handler": "g7-diary-addon.admin", "params": { "op": "pickerInput", "value": "{{$event.target.value}}" } }] },
+                { "type": "basic", "name": "Button", "props": { "type": "button", "className": "btn btn-secondary", "data-testid": "g7da-adm-direct-apply" }, "actions": [{ "type": "click", "handler": "g7-diary-addon.admin", "params": { "op": "pickerApply" } }], "text": "$t:g7-diary-addon.admin.apply" }
+              ]
+            },
+            { "type": "basic", "name": "P", "props": { "id": "g7da-adm-direct-help", "className": "{{_local.g7da?.picker?.error ? 'g7da-adm-err' : 'g7da-adm-hint'}}", "role": "{{_local.g7da?.picker?.error ? 'alert' : 'note'}}" }, "text": "{{_local.g7da?.picker?.error ? (_local.g7da?.msg?.[_local.g7da?.picker?.error] ?? '') : (_local.g7da?.picker?.kind === 'color' ? $t('g7-diary-addon.admin.direct_hex_hint') : $t('g7-diary-addon.admin.direct_emoji_hint'))}}" }
+          ]
+        }
+      ]
+    }
+  ]
+}

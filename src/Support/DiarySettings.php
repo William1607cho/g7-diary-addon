@@ -100,7 +100,8 @@ class DiarySettings
     }
 
     /**
-     * Valid weather entries; an empty or fully invalid list falls back to the defaults.
+     * Valid weather entries. A saved empty list means "no weather" (bundle 4 — the write form
+     * hides the row); a missing value or a list with no valid entry falls back to the defaults.
      *
      * @return array<int, array{key: string, emoji: string, label: string}>
      */
@@ -108,6 +109,9 @@ class DiarySettings
     {
         if (! is_array($value)) {
             return self::DEFAULTS['weather_options'];
+        }
+        if ($value === []) {
+            return [];
         }
 
         $out = [];
