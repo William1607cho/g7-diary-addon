@@ -5,7 +5,7 @@
         "ko": "일기장 게시판 애드온",
         "en": "Diary Board Add-on"
     },
-    "version": "0.3.0-dev",
+    "version": "1.0.0",
     "license": "MIT",
     "description": {
         "ko": "sirsoft-board 게시판에 일기(diary) 유형을 더하고, 자동 제목·일기 메타(분류·날씨·일기 날짜)·사진 색인을 저장하는 애드온입니다. sirsoft-board 와 템플릿은 수정하지 않으며, 애드온 전용 표·API·훅으로만 동작합니다.",

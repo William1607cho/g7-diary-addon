@@ -2,7 +2,7 @@
     "name": "plugins/g7-diary-addon",
     "description": "Diary board add-on for Gnuboard7 — adds a diary-type board to sirsoft-board with optional auto titles, diary metadata and a photo index, without modifying sirsoft-board or the template.",
     "type": "library",
-    "version": "0.3.0-dev",
+    "version": "1.0.0",
     "license": "MIT",
     "authors": [
         {
