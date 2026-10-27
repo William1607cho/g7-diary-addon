@@ -210,6 +210,63 @@ class LayoutInjectionTest extends TestCase
         $this->assertSame('{{y}}', Tree::andCondition(null, 'y'));
     }
 
+    /**
+     * Nodes carrying a lifecycle, each with the `if` conditions of its ancestors.
+     *
+     * @param  array<int, mixed>  $nodes
+     * @param  array<int, string>  $ifs
+     * @return array<int, array{node: array<string, mixed>, ifs: array<int, string>}>
+     */
+    private function lifecycleNodes(array $nodes, array $ifs = []): array
+    {
+        $found = [];
+        foreach ($nodes as $node) {
+            if (! is_array($node)) {
+                continue;
+            }
+            if (isset($node['lifecycle'])) {
+                $found[] = ['node' => $node, 'ifs' => $ifs];
+            }
+            $below = isset($node['if']) ? [...$ifs, (string) $node['if']] : $ifs;
+            $found = [...$found, ...$this->lifecycleNodes($node['children'] ?? [], $below)];
+        }
+
+        return $found;
+    }
+
+    public function test_diary_api_calls_on_the_list_mount_only_inside_the_diary_branch(): void
+    {
+        // D130: the engine runs a node's own onMount even when its `if` is false, so a diary API call in a
+        // lifecycle must sit below the diary condition, never next to it (other boards got summary / calendar 404s).
+        [$out] = (new IndexInjector($this->fragments()))->apply($this->indexTree());
+        $calls = 0;
+        foreach ($this->lifecycleNodes($out) as ['node' => $node, 'ifs' => $ifs]) {
+            if (! str_contains((string) json_encode($node['lifecycle']), '\/api\/plugins\/g7-diary-addon\/')) {
+                continue;
+            }
+            $calls += substr_count((string) json_encode($node['lifecycle']), '\/api\/plugins\/g7-diary-addon\/');
+            $this->assertFalse(isset($node['if']), ($node['id'] ?? '?').': lifecycle next to its own if');
+            $diary = array_filter($ifs, static fn (string $if): bool => str_contains($if, "posts?.data?.board?.type === 'diary'"));
+            $this->assertCount(1, $diary, ($node['id'] ?? '?').': no diary condition above');
+        }
+        $this->assertSame(2, $calls); // summary + panel calendar
+        $branch = Tree::get($out, Tree::findPath($out, static fn (array $n): bool => ($n['id'] ?? null) === IndexInjector::BRANCH_ID));
+        $this->assertFalse(isset($branch['lifecycle']));
+    }
+
+    public function test_no_fragment_puts_a_lifecycle_next_to_its_own_if(): void
+    {
+        $f = $this->fragments();
+        $dir = dirname(__DIR__, 2).'/resources/layout';
+        foreach (glob($dir.'/*/*.json') ?: [] as $file) {
+            $name = basename(dirname($file)).'/'.basename($file, '.json');
+            $node = $f->get($name);
+            foreach ($this->lifecycleNodes(array_is_list($node) ? $node : [$node]) as ['node' => $n]) {
+                $this->assertFalse(isset($n['if']), $name.': '.($n['id'] ?? '?'));
+            }
+        }
+    }
+
     public function test_all_fragments_are_valid_json_and_small(): void
     {
         $dir = dirname(__DIR__, 2).'/resources/layout';

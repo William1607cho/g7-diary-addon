@@ -1,27 +1,12 @@
 {
   "id": "g7da_list_branch",
-  "comment": "g7-diary-addon: diary list branch (D17, template not modified). Rendered only for diary boards; inserted next to the basic fallback branch, whose condition excludes diary.",
+  "comment": "g7-diary-addon: diary list branch (D17, template not modified). Rendered only for diary boards; inserted next to the basic fallback branch, whose condition excludes diary. No lifecycle here: the engine runs a node's own onMount even when its `if` is false (DynamicRenderer effect), so the diary API calls live in the child below, which mounts only inside this branch (D130, same shape as the template's auth/_redirect_if_logged_in).",
   "type": "basic",
   "name": "Div",
   "if": "{{posts?.data?.board?.type === 'diary'}}",
   "props": {
     "className": "g7da-list",
     "data-g7da": "list"
-  },
-  "lifecycle": {
-    "onMount": [
-      { "g7da_include": "common/summary-fetch" },
-      {
-        "comment": "Panel month calendar (wide screens): the month of the date filter, else this month.",
-        "handler": "apiCall",
-        "auth_mode": "optional",
-        "target": "/api/plugins/g7-diary-addon/boards/{{route.slug}}/calendar",
-        "params": { "method": "GET", "query": { "month": "{{query.diary_date ? String(query.diary_date).substring(0, 7) : ''}}" } },
-        "onSuccess": [
-          { "handler": "setState", "params": { "target": "local", "g7daPcal": "{{response.data}}" } }
-        ]
-      }
-    ]
   },
   "children": [
     { "g7da_include": "index/header" },
@@ -31,6 +16,26 @@
     { "g7da_include": "index/empty" },
     { "g7da_include": "index/pager" },
     { "g7da_include": "index/panel" },
-    { "g7da_include": "common/memories" }
+    { "g7da_include": "common/memories" },
+    {
+      "id": "g7da_list_boot",
+      "comment": "Empty node that loads the diary data on diary boards only: summary API and the panel month calendar (wide screens — the month of the date filter, else this month).",
+      "type": "basic",
+      "name": "Div",
+      "lifecycle": {
+        "onMount": [
+          { "g7da_include": "common/summary-fetch" },
+          {
+            "handler": "apiCall",
+            "auth_mode": "optional",
+            "target": "/api/plugins/g7-diary-addon/boards/{{route.slug}}/calendar",
+            "params": { "method": "GET", "query": { "month": "{{query.diary_date ? String(query.diary_date).substring(0, 7) : ''}}" } },
+            "onSuccess": [
+              { "handler": "setState", "params": { "target": "local", "g7daPcal": "{{response.data}}" } }
+            ]
+          }
+        ]
+      }
+    }
   ]
 }
